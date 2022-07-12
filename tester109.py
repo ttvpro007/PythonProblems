@@ -2825,6 +2825,23 @@ testcases = [
 ]
 
 
+def write_to_file():
+    if os.path.exists(expected_answers_file):
+        with gzip.open(expected_answers_file, 'rt', encoding = 'utf-8') as rf:
+            for line in rf:
+                print(line)
+    #         if os.path.exists('test_write.txt'):
+    #             with open('test_write.txt', 'w') as f:
+    #                 f.writelines(rf)
+    #             print('Success???')
+    #         else:
+    #             print('Failed to write')
+    # else:
+    #     print('Failed to write')
+    
+
+
+
 def run_all():
     print(f"109 Python Problems tester, {version}, Ilkka Kokkarinen.")
     try:
@@ -2875,4 +2892,49 @@ def run_all():
         exit(4)
 
 
+
+# Import expected answer by function name
+def import_answer_for(fname):
+    if os.path.exists(expected_answers_file):
+        expected_answers, curr = dict(), ''
+        with gzip.open(expected_answers_file, 'rt', encoding='utf-8') as rf:
+            storing = False
+            for line in rf:
+                line = line.strip()
+                # Special marker to indicate start of new function.
+                if line.startswith(function_prefix):
+                    curr = line[len(function_prefix):]
+                    storing = curr == fname
+                    expected_answers[curr] = []
+                elif storing:
+                    expected_answers[curr].append(line)
+    return expected_answers
+
+def get_testcases_details(fname):
+    try:
+        f = labs109.__dict__[fname]
+    except KeyError as e:
+        print(f"ERROR: NO FUNCTION WITH NAME '{e}' FOUND IN MODULE labs109...")
+        exit(1)
+    # if len(index_match) > 0:
+    #     print(f'Test case {fname} match with stored test cases at index {index_match[0]}')
+    index_match = [index for index, testcase in enumerate(testcases) if testcase[0] == fname][0]
+    return (f, testcases[index_match][1], testcases[index_match][2])
+
+# Check one function with expected answer
+def check_function(fname):
+    print(f"Attempting to test function '{fname}' in module labs109...")
+    f, testcases_, expected_checksum_ = get_testcases_details(fname)
+    test_one_function(f, testcases_, expected_checksum_, expected_answers=import_answer_for(fname))
+
+
+
+
+
 run_all()
+
+# check_function('nearest_smaller')
+
+
+
+
