@@ -1,5 +1,55 @@
-# As an example, here is an implementation of
-# the first problem "Ryerson Letter Grade":
+import numpy
+
+
+# helper functions
+def get_list_without_element_at_index(l, i):
+    if i not in range(len(l)):
+        raise IndexError
+    if i == 0:
+        return l[ 1 : len(l) ]
+    elif i == len(l) - 1:
+        return l[ : -1]
+    return l[ 0 : i ] + l[ i + 1 : len(l) ]
+
+
+def get_element_index_dict(items):
+    d = {}
+    for i in range(len(items)):
+        if items[i] not in d:
+            d[items[i]] = [i]
+        else:
+            d[items[i]].append(i)
+    return d
+
+
+def get_element_frequency_dict(items):
+    d = {}
+    for item in items:
+        if item not in d:
+            d[item] = 1
+        else:
+            d[item] += 1
+    return d
+
+
+def remove(input_list, element_to_remove):
+    
+    element_to_remove_indices_indices = []
+    
+    for index in range(len(input_list)):
+        
+        if input_list[index] == element_to_remove:
+            element_to_remove_indices_indices.append(index - len(element_to_remove_indices_indices))
+    
+    for index in element_to_remove_indices_indices:
+        del input_list[index]
+        
+    return input_list
+
+
+"""
+Ryerson Letter Grade - page 10
+"""
 
 
 def ryerson_letter_grade(n):
@@ -23,7 +73,7 @@ def ryerson_letter_grade(n):
 
 
 """
-Ascending list
+Ascending list - page 11
 """
 
 
@@ -37,7 +87,7 @@ def is_ascending(items):
 
 
 """
-Riffle shuffle kerfuffle
+Riffle shuffle kerfuffle - page 12
 """
 
 
@@ -52,7 +102,7 @@ def riffle(items, out = True):
 
 
 """
-Even the odds
+Even the odds - page 13
 """
 
 
@@ -61,7 +111,7 @@ def only_odd_digits(n):
 
 
 """
-Cyclops numbers
+Cyclops numbers - page 14
 """
 
 
@@ -73,7 +123,7 @@ def is_cyclops(n):
 
 
 """
-Domino cycle
+Domino cycle - page 15
 """
 
 
@@ -87,16 +137,18 @@ def domino_cycle(tiles):
 
 
 """
-Colour trio
+Colour trio - page 16
 """
 
 
 def colour_trio(colours):
     if len(colours) <= 1:
         return colours
+    
     new_colour = ''
     for i in range(len(colours) - 1):
         new_colour += get_mixed_colour(colours[i], colours[i + 1])
+        
     return colour_trio(new_colour)
 
 
@@ -109,55 +161,69 @@ def get_mixed_colour(colour1, colour2):
 
 
 """
-Count dominators
+Count dominators - page 17
 """
 
 
 def count_dominators(items):
     if len(items) == 0:
         return 0
+    
     count = 1
     current_max = items[len(items) - 1]
+    
     for i in range(len(items) - 2, -1, -1):
         if items[i] > current_max:
             count += 1
             current_max = items[i]
+            
     return count
 
 
 """
-Beat the previous
+Beat the previous - page 18
 """
 
 
 def extract_increasing(digits):
+    
     result = [int(digits[0])]    
     i = 1
+    
     while i < len(digits):
+    # for i in range(len(digits)):
+        
         num = digits[i]
+        
         while int(num) <= result[len(result) - 1] and i < len(digits) - 1:
             i += 1
             num += digits[i]
+            
         if int(num) > result[-1:][0]:
             result.append(int(num))
+            
         i += 1
+        
     return result
 
 
 """
-Subsequent words
+Subsequent words - page 19
 """
 
 
 def words_with_letters(words, letters):
+    
     result = []
     for word in words:
         if check_word_with_letters(word, letters):
             result.append(word)
+            
     return result
 
 
 def check_word_with_letters(word, letters):
+    
     # remove invalid cases
     if len(word) < len(letters):
         return False
@@ -175,40 +241,52 @@ def check_word_with_letters(word, letters):
     # bronchiectatic
     # 01234567
     # the letter 'b' at index 0 of letters will be compared to the first 8 letters (index 0-7) in the sample word
+    
     match_count = 0
     last_match_index = -1
+    
     for i in range(len(letters), 0, -1):
+        
         # as we iterate throuth the letters, we expand the search window for the next letter
         start_search_index = last_match_index + 1 if -1 < last_match_index else 0
+        
         for j in range(start_search_index, len(word) - i + 1):
             if letters[len(letters) - i] == word[j]:
                 match_count += 1
                 last_match_index = j
                 break
+            
             # if reached the end of search but match count does not match 
             # the number of letter searched we return false
             if j == len(word) - i != match_count:
                 return False
+            
     return match_count == len(letters)
 
 
 """
-Taxi ℤum ℤum
+Taxi ℤum ℤum - page 20
 """
 
 
 def taxi_zum_zum(moves):
+    
     # 4 directions represented as (x, y)
     four_directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
     current_direction = 0
     current_position = (0, 0)
+    
     for move in moves:
+        
         if move == 'R':
             current_direction += 1
+            
         if move == 'L':
             current_direction -= 1
+            
         if move == 'F':
             current_position = get_new_position(current_position, four_directions[current_direction % 4])
+            
     return current_position
 
 
@@ -217,99 +295,123 @@ def get_new_position(current_position, direction):
 
 
 """
-Exact change only
+Exact change only - page 21
 """
 
 
 def give_change(amount, coins):
+    
     change = []
     for coin in coins:
+        
         coin_needed = amount // coin
+        
         for i in range(coin_needed):
             change.append(coin)
+            
         amount -= coin * coin_needed
+        
     return change
 
 
 """
-Rooks on a rampage
+Rooks on a rampage - page 22
 """
 
 
 def safe_squares_rooks(n, rooks):
     if len(rooks) < 1:
         return n * n
+    
     dangerous_rows = []
     dangerous_cols = []
     safe_rows = []
     safe_cols = []
+    
     for rook in rooks:
         dangerous_cols.append(rook[0])
         dangerous_rows.append(rook[1])
+        
     safe_rows = get_available_number_in_range(list(set(dangerous_rows)), n)
     safe_cols = get_available_number_in_range(list(set(dangerous_cols)), n)
+    
     #result is the product of the number of safe x positions and the number of safe y positions
     return len(safe_rows) * len(safe_cols)
 
 
 def get_available_number_in_range(input_list, max_range):
+    
     if len(input_list) == 0:
         return []
+    
     input_list.sort()
     output_list = []
     output_list += [n for n in range(0, input_list[0])]
+    
     for index, item in enumerate(input_list):
         if index < len(input_list) - 1:
             output_list += [n for n in range(item + 1, input_list[index + 1])]
         else:        
             output_list += [n for n in range(input_list[len(input_list) - 1] + 1, max_range)]
+            
     return output_list
 
 
 """
-Try a spatula
+Try a spatula - page 23
 """
 
 
 def pancake_scramble(text):
+    
     positions = [n for n in range(len(text))]
     for i in range(2, len(text) + 1):
+        
         for index, position in enumerate(positions[:i][::-1]):
             positions[index] = position
+            
     return ''.join([text[positions[i]] for i in range(len(positions))])
 
 
 """
-Words with given shape
+Words with given shape - page 24
 """
 
 
 def words_with_given_shape(words, shape):
+    
     result = []
     for word in words:        
         if check_word_with_shape(word, shape):
             result.append(word)
+            
     return result
 
 
 def check_word_with_shape(word, shape):
+    
     if len(word) != len(shape) + 1:
         return False
+    
     for i in range(1, len(word)):
+        
         if shape[i - 1] == -1:
             if word[i - 1] <= word[i]:
                 return False
+            
         if shape[i - 1] == 0:
             if word[i - 1] != word[i]:
                 return False
+            
         if shape[i - 1] == 1:
             if word[i - 1] >= word[i]:
                 return False
+            
     return True
 
 
 """
-Chirality
+Chirality - page 25
 """
 
 # not completed
@@ -318,32 +420,39 @@ def is_left_handed(pips):
 
 
 """
-The card that wins the trick
+The card that wins the trick - page 26
 """
 
 
 def winning_card(cards, trump = None):
+    
     rank = {'two': 1, 'three': 2, 'four': 3, 'five': 4, 'six': 5, 'seven': 6, 'eight': 7,
             'nine': 8, 'ten': 9, 'jack': 10, 'queen': 11, 'king': 12, 'ace': 13}
+    
     potential_winning_hands = []
+    
     # set trump as first card played IF
     # 1 - not already set
     # or
     # 2 - the set trump is not in the whole trick
     if not trump or not trump in [card[1] for card in cards]:
         trump = cards[0][1]
+        
     for i in range(len(cards)):
         if cards[i][1] == trump:
             potential_winning_hands.append(cards[i])
+            
     if len(potential_winning_hands) == 0:
         return cards[0]
+    
     # sort the hands descending base on the ranks points
     potential_winning_hands.sort(key = lambda hand : rank[hand[0]], reverse = True)
+    
     return potential_winning_hands[0]
 
 
 """
-Do you reach many, do you reach one?
+Do you reach many, do you reach one? - page 27
 """
 
 # not completed
@@ -352,40 +461,48 @@ def knight_jump(knight, start, end):
 
 
 """
-Sevens rule, zeros drool
+Sevens rule, zeros drool - page 28
 """
 
 
 def seven_zero(n):
+    
     if has_only_seven_or_zero(n):
         return n
+    
     # we check from length of number n if starting digit of n is lesser than 7
     # otherwise we check from length of number n + 1
     # e.g. n = 17, d = 2 so we're checking from 70, 77, .....
     # n = 81, d = 3 so we're checking from 700, 770, 777, .....
     d = len(str(n)) + (0 if str(n)[0] <= '7' else 1)
+    
     while True:
         result = int('7' * d)
         if result % n == 0:
             return result
+        
         k = 1
         while k < d:
             result = int('7' * k + '0' * (d - k))
             if result % n == 0:
                 return result
+            
             k += 1
+            
         d += 1    
             
     
 def has_only_seven_or_zero(n):
+    
     for d in str(n):
         if d != '0' and d != '7':
             return False
+        
     return True
 
 
 """
-Fulcrum
+Fulcrum - page 29
 """
 
 
@@ -422,40 +539,50 @@ def can_balance(items):
     
     # the algorithm to check all posible fulcrum indices until we reach a conclusion
     for i in range(start_index, end_index, step):
+        
         # store moving direction
         last_move_direction = move_direction
         move_direction = get_balance_direction(potential_fulcrum_index + offset, items)
+        
         # if current moving direction is the opposite of the last moving direction
         # meaning we went from posible fulcrum index to the heavier weight direction
         # then goes back toward the posible fulcrum index... meaning not possible to balance
         if last_move_direction * move_direction < 0:
             return -1
+        
         if move_direction == 0:
             return potential_fulcrum_index + offset
+        
         offset += move_direction
 
 
 # check which side is heavier or if both are equals
 # then get the moving direction to the heavier side to attempt balancing left and right
 def get_balance_direction(potential_fulcrum_index, items):
+    
     left_weight, right_weight = 0, 0
+    
     for i in range(potential_fulcrum_index):
         left_weight += abs(i - potential_fulcrum_index) * items[i]
+        
     for i in range(potential_fulcrum_index + 1, len(items)):
         right_weight += abs(i - potential_fulcrum_index) * items[i]
+        
     # if balanced, don't move
     if left_weight == right_weight:
         return 0
+    
     # if left heavy, move to left
     if left_weight > right_weight:
         return -1
+    
     # if right heavy, move to right
     if left_weight < right_weight:
         return 1
     
     
 """
-Fail while daring greatly
+Fail while daring greatly - page 30
 """
 
 
@@ -473,22 +600,25 @@ def josephus(n, k):
 
 
 """
-All your fractions are belong to base
+All your fractions are belong to base - page 31
 """
 
 
 def group_and_skip(n, out, ins):
+    
     coin_groups = n // out
     left_over = n % out
     left_over_list = [left_over]
+    
     if coin_groups > 0:
         # call recursive function until n (= coin_groups * ins) is less or equal to 0
         left_over_list += group_and_skip(coin_groups * ins, out, ins)
+        
     return left_over_list
 
 
 """
-Count the balls off the brass monkey
+Count the balls off the brass monkey - page 32
 """
 
 
@@ -498,7 +628,7 @@ def pyramid_blocks(n, m, h):
 
 
 """
-Count growlers
+Count growlers - page 33
 """
 
 def count_growlers(animals):
@@ -519,56 +649,73 @@ def count_growlers(animals):
     # attempting for a faster solution (0.1s)
     dogs_to_the_right = count_dogs(animals, len(animals) - 2, -1, -1)
     dogs_to_the_left = count_dogs(animals, 1, len(animals), 1)
+    
     for i in range(len(animals)):
         is_facing_left = animals[i] in facing_left
         dog_cat_diff = dogs_to_the_left[i] if is_facing_left else dogs_to_the_right[i]
         growler_count += 1 if dog_cat_diff > 0 else 0
+        
     return growler_count
 
 # count dogs to the right or left of every elements in the current animals list
 def count_dogs(animals, start_index, end_index, step):
+    
     dogs, dog_counts = ['dog', 'god'], [0]
     dog_count = 0
+    
     for i in range(start_index, end_index, step):
         dog_count += 1 if animals[i + -step] in dogs else -1
+        
         if step == -1:
             dog_counts.insert(0, dog_count)
+            
         elif step == 1:
             dog_counts.append(dog_count)
+            
     return dog_counts
 
 
 """
-Bulgarian solitaire
+Bulgarian solitaire - page 34
 """
 
 
 def bulgarian_solitaire(piles, k):
+    
     goal = [n for n in range(1, k + 1)]
+    
     piles.sort()
+    
     count = 0
+    
     while piles != goal:
         count += 1
+        
         # a list of zero element indices
         zero_elements_indices = []
         new_pile = 0
+        
         # the bulgarian solitaire playing rules
         for i in range(len(piles)):
             piles[i] -= 1
             new_pile += 1
+            
             if piles[i] == 0:
                 zero_elements_indices.append(i - len(zero_elements_indices))
+                
         # remove all zeroes if available
         if len(zero_elements_indices) > 0:
             for index in zero_elements_indices:
                 del piles[index]
+                
         piles.append(new_pile)
         piles.sort()
+        
     return count
 
 
 """
-Scylla or Charybdis?
+Scylla or Charybdis? - page 35
 """
 
 # not completed
@@ -647,7 +794,7 @@ def get_safe_squares(n):
                                 #        +++++|++++++++++++
 
 """
-Longest arithmetic progression
+Longest arithmetic progression - page 36
 """
 
 # not completed
@@ -679,7 +826,7 @@ def arithmetic_progression(items, stride = None):
     if stride == None:
         stride = 0
     prog_seq = []
-    n = 0
+    # n = 0
     index_stride_dict = {}
     
     for i in range(len(items) - 1):
@@ -776,7 +923,7 @@ def arithmetic_progression(items, stride = None):
 
 
 """
-Best one out of three
+Best one out of three - page 37
 """
 
 # not completed
@@ -790,94 +937,107 @@ def tukeys_ninthers(items):
 
 
 """
-Collecting numbers
+Collecting numbers - page 38
 """
 
 
 def collect_numbers(perm):
+    
     inv_perm = get_inverted_permutation(perm)
     count = 1
+    
     for i in range(len(inv_perm) - 1):
         if inv_perm[i] > inv_perm[i + 1]:
             count += 1
+            
     return count
 
 
 def get_inverted_permutation(perm):
+    
     inv_perm = [0] * len(perm)
+    
     for i in range(len(perm)):
         inv_perm[perm[i]] = i
+        
     return inv_perm
 
 
 """
-Between the soft and the NP-hard place
+Between the soft and the NP-hard place - page 39
 """
 
 
 # NEED TO FIX PDF DESCRIPTION!!!!!!!!!
 def verify_betweenness(perm, constraints):
+    
     for constraint in constraints:
         if not find_match(perm, constraint) and not find_match(perm[::-1], constraint):
             return False
+        
     return True
 
 
 def find_match(perm, constraint):
+    
     match_found = 0
     match_index = -1
+    
     for i in range(len(constraint)):
         for j in range(match_index + 1, len(perm)):
             if constraint[i] == perm[j]:
                 match_index = j
                 match_found += 1
                 break
+            
     return match_found == len(constraint)
 
 
 """
-Count Troikanoff, I presume
+Count Troikanoff, I presume - page 40
 """
 
 
 def count_troikas(items):
-    element_frequency_dict = get_element_frequency_dict(items)
-    #print(element_frequency_dict)
+    
+    element_frequency_dict = get_element_index_dict(items)
+    
+    print(element_frequency_dict)
+    
     troikas = 0
+    
     for key in element_frequency_dict.keys():
+        
         if len(element_frequency_dict[key]) < 3:
             #print(f'continue here because element_frequency_dict[{key}] {element_frequency_dict[key]} < 3')
             continue
+        
         #print('\nbegins checking for troikas')
         for outer_index in range(len(element_frequency_dict[key]) - 2):
+        
             i = element_frequency_dict[key][outer_index]
+            
             #print(f'i = {i}')
             for inner_index in range(outer_index + 1, len(element_frequency_dict[key]) - 1):
+            
                 j = element_frequency_dict[key][inner_index]
                 #print(f'\tj = {j}')
                 k = 2 * j - i
                 #print(f'\tk = {k}')
+                
                 if k not in range(len(items)):
                     #print(f'break here because k {k} is not in range of items {len(items)}')
                     break
+                
                 if items[i] == items[j] == items[k]:
                     #print(f'troika found at i {i}, j {j}, k {k}')
                     troikas += 1
+                    
     return troikas
 
 
-def get_element_frequency_dict(items):
-    res = {}
-    for i in range(len(items)):
-        if items[i] not in res:
-            res[items[i]] = [i]
-        else:
-            res[items[i]].append(i)
-    return res
-
-
 """
-Crack the crag
+Crack the crag - page 41
 """
 
 
@@ -970,102 +1130,152 @@ def get_category(dice):
 # multiply the face value with its occurences
 # then return the highest score possible
 def get_any_numbers_score(dice):
+    
     dice_frequency_dict = {}
+    
     for i in range(len(dice)):
         if dice[i] not in dice_frequency_dict:
             dice_frequency_dict[dice[i]] = 1
+            
         else:
             dice_frequency_dict[dice[i]] += 1
+            
     return max(entry[0] * entry[1] for entry in dice_frequency_dict.items())
 
 
 def crag_score(dice):
+    
     constant_scoring_categories = { 0 : 50, 1 : 26, 2 : 25, 3 : 20 }
+    
     category = get_category(dice)
+    
     if category < 4:
         return constant_scoring_categories[category]
+    
     return get_any_numbers_score(dice)
 
 
 """
-Three summers ago
+Three summers ago - page 42
 """
 
 
 def three_summers(items, goal):
+    
     for i in range(len(items)):
         new_items = get_list_without_element_at_index(items, i)
         if two_summers(new_items, goal - items[i]):
             return True
+        
     return False
 
 
-def get_list_without_element_at_index(l, i):
-    if i not in range(len(l)):
-        raise IndexError
-    if i == 0:
-        return l[ 1 : len(l) ]
-    elif i == len(l) - 1:
-        return l[ : -1]
-    return l[ 0 : i ] + l[ i + 1 : len(l) ]
-
-
 def two_summers(items, goal, i = 0, j = None):
+    
     if j == None:
         j = len(items) - 1    
+        
     if i < j:
+        
         if items[i] + items[j] > goal:
             return two_summers(items, goal, i, j - 1)
+        
         if items[i] + items[j] < goal:
             return two_summers(items, goal, i + 1, j)
+        
         if items[i] + items[j] == goal:
             return (i, j)
+        
     return None
 
 
 """
-Sum of two squares
+Sum of two squares - page 43
 """
-
-
-import numpy
 
 
 def sum_of_two_squares(n):
+    
     i, j = 1, int(numpy.sqrt(n - 1))
+    
     while i <= j:
+        
         if i * i + j * j < n:
             i += 1
+            
         elif i * i + j * j > n:
             j -= 1
+            
         else:
             return (j, i)
+        
     return None
 
 
 """
-Carry on Pythonista
+Carry on Pythonista - page 44
 """
 
-def count_carries(a, b):
-    return
+def count_carries(a, b, print_result = False):
+    
+    # initial values
+    carry_count, carry_over = 0, 0
+    
+    # convert a and b to string for interation
+    a_str, b_str = str(a), str(b)
+    
+    smaller_number = a_str if a <= b else b_str
+    bigger_number = a_str if a > b else b_str
+    
+    # used to calculate the index for smaller number
+    len_diff = len(bigger_number) - len(smaller_number)
+    
+    # 99999999 -> length of 8 starts at index_1 = 7
+    # 88       -> length of 2 starts at index_2 = 1 or index_1 - length difference = 7 - 6 = 1
+    # length difference   = 6
+    
+    # it's a bit harder to calculate index if we choose to iterate backward
+    for i in range(len(bigger_number) - 1, -1, -1):
+        
+        sum_digit = 0
+        
+        # if i - len_diff >= 0 meaning we have digits to add between 2 numbers
+        if i >= len_diff:
+            sum_digit = int(smaller_number[i - len_diff]) + int(bigger_number[i]) + carry_over
+        else:
+            # break if we run out of digits from smaller number AND carry over is 0 or less
+            if carry_over <= 0: break
+            
+            sum_digit = int(bigger_number[i]) + carry_over
+        
+        # after we have used the carry over, we set it to 0
+        carry_over = 0
+        
+        if sum_digit > 9:
+            # get the tens and assign to carry over
+            carry_over = sum_digit // 10
+            
+            carry_count += 1
+    
+    return carry_count
 
 
 """
-As below, so above
+As below, so above - page 45
 """
 
-
+# not completed
 def leibniz(heads, positions):
     return
 
 
 """
-Expand positive integer intervals
+Expand positive integer intervals - page 46
 """
 
 
 def expand_intervals(intervals):
+    
     # handle ''
     if intervals == '':
         return []
@@ -1075,21 +1285,25 @@ def expand_intervals(intervals):
     # handle comma separated intervals
     intervals_list = intervals.split(',')
     for i in range(len(intervals_list)):
+        
         # handle dash separated intervals
         # returns original string if there is no dash
         # meaning '42'.split('-') -> '42'
         limits = intervals_list[i].split('-')
+        
         # add to result if only one limit
         if len(limits) == 1:
             result.append(int(limits[0]))
+            
         # otherwise add to the result a list from lower limit to upper limit inclusively
         else:
             result += [n for n in range(int(limits[0]), int(limits[1]) + 1)]
+            
     return result
 
 
 """
-Collapse positive integer intervals
+Collapse positive integer intervals - page 47
 """
 
 
@@ -1103,8 +1317,12 @@ def collapse_intervals(items):
     # find consecutive sublists
     sublist_count = 1
     for i in range(len(items) - 1):
+        
+        # if is consecutive, add to list
         if items[i + 1] - items[i] == 1:
             sublists[sublist_count].append(items[i + 1])
+        
+        # otherwise 
         else:
             sublist_count += 1
             sublists[sublist_count] = [items[i + 1]]
@@ -1113,7 +1331,7 @@ def collapse_intervals(items):
 
 
 """
-Prominently featured
+Prominently featured - page 48
 """
 
 
@@ -1246,7 +1464,7 @@ def prominences(heights):
 
 
 """
-Like a kid in a candy store, except without money
+Like a kid in a candy store, except without money - page 49
 """
 
 
@@ -1292,7 +1510,7 @@ def candy_share(candies):
 
 
 """
-Dibs to dubs
+Dibs to dubs - page 50
 """
 
 
@@ -1349,7 +1567,7 @@ def calculate_score(duplicate_number):
 
 
 """
-Nearest smaller element
+Nearest smaller element - page 51
 """
 
 
@@ -1413,16 +1631,311 @@ def custom_min(*args):
 
 
 """
-Interesting, intersecting
+Interesting, intersecting - page 52
 """
 
 
 def squares_intersect(s1, s2):
-    return
+    # we have square1 (x1, y1, length_1) and square2 (x2, y2, length_2)
+    # let's say square1 is on the left of square2 meaning x1 < x2
+    # and square2 is on the bottom of square1 meaning y2 < y1
+    # they are intersected when x1 + length_1 >= x2 AND y2 + length_2 >= y1
+    # in short, x_left + length_left >= x_right AND y_bottom + length_bottom >= y_top
+    
+    # we first find the square on the left, right, top, and bottom
+    left, right = s1 if s1[0] < s2[0] else s2, s1 if s1[0] > s2[0] else s2
+    bottom, top = s1 if s1[1] < s2[1] else s2, s1 if s1[1] > s2[1] else s2
+    
+    # apply logic x_left + length_left >= x_right AND y_bottom + length_bottom >= y_top
+    return left[0] + left[2] >= right[0] and bottom[1] + bottom[2] >= top[1]
 
 
 """
-Fibonacci sum
+So shall you sow - page 53
+"""
+
+
+def oware_move(board, house_index):
+    
+    seeds_to_sow = board[house_index]
+    
+    # set the house we took the seeds from to 0
+    board[house_index] = 0
+    
+    stop_sowing_house_index = -1
+    
+    # if we have enough seeds to loop the board more than once
+    # we check if seeds_to_sow >= len(board) because we skip sowing
+    # at the house we picked up the seeds from
+    # meaning if board has 8 houses, and we picked up 7
+    # we can sow up to the house just before the house we picked up the seeds from
+    # and if we picked up 8 seed, we skip the house where the seeds was from
+    # and sow up to the house next to the house we picked up the seeds from
+    # therefore, we need at least len(board) number of seeds to loop the board more than once
+    if seeds_to_sow >= len(board):
+        
+        seeds_per_house = seeds_to_sow // (len(board) - 1) # skip origin house so it's len(board) - 1
+                                                            # evenly distributed seeds per house if can loop the board more than once
+                                                           
+        seeds_left_over = seeds_to_sow % (len(board) - 1)  # we will have left over if we loop the board more than once
+        
+        # sow the seeds
+        for i in range(len(board)):
+            if i == house_index: continue # skip origin house
+            board[i] += seeds_per_house
+        
+        
+        # sow the left over seeds after looping
+        for i in range(seeds_left_over):
+            board[(house_index + i + 1) % len(board)] += 1 # sow from the house next to the origin house
+                                                           # and wrap over if index goes out of bound up to origin house index - 1
+                                                           # because left over seeds is not enough to loop the board
+                                                           
+        # we keep track of the house index that we stop sowing
+        stop_sowing_house_index = (house_index - 1 + seeds_left_over if seeds_left_over == 0 else house_index + seeds_left_over) % len(board)
+    
+    # if we don't need to loop the board
+    else:
+        
+        # sow the seeds
+        for i in range(seeds_to_sow):
+            board[(house_index + i + 1) % len(board)] += 1
+            
+        stop_sowing_house_index = (house_index + seeds_to_sow) % len(board)
+        
+    return capture_seeds(board, stop_sowing_house_index)
+    seeds_to_sow = board[house_index]
+    
+    seeds_per_house = seeds_to_sow // (len(board) - 1) # skip origin house so it's len(board) - 1
+                                                       # evenly distributed seeds per house if can loop the board more than once
+                                                       
+    seeds_left_over = seeds_to_sow % (len(board) - 1)  # we will have left over if we loop the board more than once
+    
+    # sow the seeds
+    for i in range(len(board)):
+        if i == house_index: continue # skip origin house
+        board[i] += seeds_per_house
+    
+    
+
+    stop_sowing_house_index = -1
+    
+    if seeds_to_sow >= len(board):
+        
+        # sow the left over seeds after looping
+        for i in range(seeds_left_over):
+            board[(house_index + i + 1) % len(board)] += 1 # sow from the house next to the origin house
+                                                           # and wrap over if index goes out of bound up to origin house index - 1
+                                                           # because left over seeds is not enough to loop the board
+                                                           
+        stop_sowing_house_index = (house_index - 1 + seeds_left_over if seeds_left_over == 0 else house_index + seeds_left_over) % len(board)
+        
+    else:        
+        
+        stop_sowing_house_index = (house_index + seeds_to_sow) % len(board)                                      
+                                                       
+    return (board, stop_sowing_house_index)
+
+
+def capture_seeds(board, stop_sowing_house_index):
+    
+    # remove from the house we stopped sowing from if it's in opponent's territory
+    is_in_opponent_territory = stop_sowing_house_index >= len(board) // 2
+    
+    if is_in_opponent_territory:
+        
+        for i in range(stop_sowing_house_index, len(board) // 2 - 1, -1):
+            
+            # continue to take seeds from opponent if satisfy condition
+            if board[i] == 2 or board[i] == 3:
+                board[i] = 0
+                
+            # stop when we cannot take the seeds
+            else: break
+        
+    return board
+
+
+"""
+That's enough of you! - page 54
+"""
+
+
+def remove_after_kth(items, k=1):
+    
+    seen = get_element_frequency_dict(items)
+    
+    for i in range(len(items) - 1, -1, -1):
+        if seen[items[i]] > k:
+            seen[items[i]] -= 1
+            items[i] = None
+            
+    return remove(items, None)
+
+
+"""
+Brussel's choice - page 55
+"""
+
+
+def brussels_choice_step(n, mink, maxk):
+    
+    result = []
+    
+    for k in range(mink, maxk + 1):
+        result += brussels_substring_transform(str(n), k)
+        
+    result.sort()
+    
+    return result
+
+
+def brussels_substring_transform(number_string, number_count):
+    
+    brussels_substrings = []
+    
+    for i in range(len(str(number_string)) - number_count + 1):
+        # first part
+        sub_n_str_pre = number_string[ : i ]
+        # mid part
+        sub_n_str_mid = number_string[ i : i + number_count ]
+        # last part
+        sub_n_str_pst = number_string[ i + number_count : ]
+        
+        # the part that we need to calculate is mid
+        sub_n_int = int(sub_n_str_mid)
+        
+        if sub_n_int % 2 == 0:
+            brussels_substrings.append(int(sub_n_str_pre + str(sub_n_int // 2) + sub_n_str_pst))
+            
+        brussels_substrings.append(int(sub_n_str_pre + str(sub_n_int * 2) + sub_n_str_pst))
+        
+    return brussels_substrings
+
+
+"""
+Cornered cases - page 56
+"""
+
+# not completed
+def count_corners(points):
+    
+    # condition to be corner:
+    # p1 (x, y + h)
+    #     |\
+    #     |  \
+    #     |    \
+    #     |      \
+    #     |        \
+    #     |__________\
+    # p0 (x, y)     p2 (x + h, y)
+    
+    count = 0
+    
+    tris = []
+    
+    same_x = {}
+    same_y = {}
+    
+    for point in points:
+        if point[0] not in same_x:
+            same_x[point[0]] = [point[1]]
+        else:
+            same_x[point[0]].append(point[1])
+            
+        if point[1] not in same_y:
+            same_y[point[1]] = [point[0]]
+        else:
+            same_y[point[1]].append(point[0])
+            
+    print('same x', same_x)
+    print('same y', same_y)
+    
+    for x in same_x:
+        for y in same_x[x]:
+            print(f'{x}, {y}')
+            
+    return tris
+
+
+# print(count_corners([(1, 3), (1, 4), (1, 5), (1, 6), (2, 3), (3, 3), (4, 3)]))
+
+
+"""
+Count consecutive summers - page 57
+"""
+
+# what???... wow...
+# by definition, the count of consecutive number that adds up to the number n
+# is the count of the odd divisors + 1
+def count_consecutive_summers(n):
+    count = 1
+    for i in range(2, n + 1):
+        # if is odd divisor
+        if i % 2 == 1 and n % i == 0:
+            count += 1
+    return count
+
+
+"""
+McCulloch's second machine - page 58
+"""
+
+
+def mcculloch(digits):
+    
+    command_dict = {
+        '3' : lambda y : y + '2' + y,
+        '4' : lambda y : y[ : : -1 ],
+        '5' : lambda y : y + y 
+    }
+    
+    # the first '2' is the break number between
+    # the commands and the part we need to work on which is y
+    break_index = digits.index('2')
+    
+    y = digits[ break_index + 1 : ]
+    commands = digits[ : break_index ]
+    
+    for command in command_dict['4'](commands):
+        y = command_dict[command](y)
+        
+    return y
+
+
+"""
+That's enough for you! - page 59
+"""
+
+
+def first_preceded_by_smaller(items, k = 1):
+    
+    # iterate from index = k because we don't need to
+    # check an item that has no k elements before it
+    # Ex: [1, 2, 3, 4, 5], k = 3, we check from 4 onward
+    for i in range(k, len(items)):
+        
+        smaller_count = 0
+        
+        # from 0 to i, keep track of the elements
+        # that are smaller than the current element
+        for j in range(i):
+            
+            if items[j] < items[i]:
+                smaller_count += 1
+            
+            # we have a hit if the count is equals to k
+            # don't need to check further since the number
+            # of smaller elements preceeded current elements
+            # don't need to be exactly equal to k
+            if smaller_count == k:
+                return items[i]
+    
+    return None
+
+
+"""
+Fibonacci sum - page 99
 """
 
 
@@ -1454,4 +1967,12 @@ def fibonacci_sequence(threshold):
         fib_seq.append(n_0)
         
     return fib_seq
+
+    # n_0, n_1 = 0, 1
+    # yield n_0
+    # yield n_1
+    
+    # while n_1 <= threshold:
+    #     n_0, n_1 = n_1, n_0 + n_1
+    #     yield n_0
 

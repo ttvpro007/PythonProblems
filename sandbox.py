@@ -92,11 +92,14 @@ def make_color(input_list):
 # print('\033[0m, '.join(elem for elem in make_color(input_list)))
 
 
-def remove_zeroes(input_list):
+def remove(input_list, element_to_remove):
+    
     zero_indices = []
     modified_zero_indices = []
+    
     for index in range(len(input_list)):
-        if input_list[index] == 0:
+        
+        if input_list[index] == element_to_remove:
             zero_indices.append(index)
             modified_zero_indices.append(index - len(modified_zero_indices))
     
@@ -108,7 +111,7 @@ def remove_zeroes(input_list):
 
 
 #from random import randrange
-#remove_zeroes([(7 * randrange(0, 17) - i) % 3 for i in range(20)])
+#remove([(7 * randrange(0, 17) - i) % 3 for i in range(20)])
 
 
 def print_format_table():
@@ -226,9 +229,35 @@ def find_perfect_square(n):
     return x
 
 
-d = { "name":"John", "age":30, "city":"New York"}
+# d = { "name":"John", "age":30, "city":"New York"}
 
-create_file('cs109_module6_examples.py')
-create_file('cs109_module6_examples_data.json')
+# create_file('cs109_module6_examples.py')
+# create_file('cs109_module6_examples_data.json')
 
+
+def count(x, terminating_condition, step):
+    
+    y = x + step
+    
+    if step == 0:
+        return terminating_condition
+    
+    elif step < 0:
+        print(y)
+        if y > terminating_condition:
+            return count(y, terminating_condition, step)
+        else:
+            return y
+    
+    elif step > 0:
+        print(y)
+        if y < terminating_condition:
+            return count(y, terminating_condition, step)
+        else:
+            return y
+        
+    
+
+
+print(count(10, 1, 1))
 

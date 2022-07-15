@@ -2931,9 +2931,9 @@ def check_function(fname):
 
 
 
-run_all()
+# run_all()
 
-# check_function('nearest_smaller')
+check_function('first_preceded_by_smaller')
 
 
 
