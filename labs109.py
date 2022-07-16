@@ -1,6 +1,131 @@
 import numpy
 
 
+# helper classes
+class Node:
+    def __init__(self, data):
+        self._data = data
+        self._left_node = None
+        self._right_node = None
+        
+    @property
+    def data(self):
+        return self._data
+    @data.setter
+    def data(self, data):
+        self._data = data
+    
+    @property
+    def left_node(self):
+        return self._left_node
+    @left_node.setter
+    def left_node(self, left_node):
+        self._left_node = left_node
+        
+    @property
+    def right_node(self):
+        return self._right_node
+    @right_node.setter    
+    def right_node(self, right_node):
+        self._right_node = right_node
+        
+        
+class DoublyLinkedList:
+    def __init__(self, head : Node = None):
+        self._head : Node = head
+        self._tail : Node = head
+        self._items = []
+        
+        if head:
+            self._link_nodes(self._head, self._tail)
+            self._items += [self._head]
+    
+    # implement this to make class iterable
+    def __iter__(self):
+        return self.traverse_right()
+    
+    # implement this to use subscript and get value
+    # for example my_var = my_list[0]
+    def __getitem__(self, index):
+        return self._items[index]
+    
+    # implement this to use subscript and set value
+    # for example my_list[0] = my_val
+    def __setitem__(self, index, node):
+        if node == None:
+            raise ValueError('Node cannot be None')
+        
+        node_at_index = self.__getitem__(index)
+        left_node = node_at_index.left_node
+        right_node = node_at_index.right_node
+        
+        # remove first because remove adjust the links
+        # for the left and right node of the removed node
+        # therefore if link the new node first, the
+        # adjustment in remove will nullify the changes
+        self.remove(node_at_index)
+        
+        self._link_nodes(left_node, node)
+        self._link_nodes(node, right_node)
+        
+        
+        self._items[index] = node
+    
+    # implement this to utilize the len() function for length
+    def __len__(self):
+        return len(self._items)
+    
+    # this link nodes together
+    def _link_nodes(self, left_node : Node, right_node : Node):
+        left_node.right_node = right_node
+        right_node.left_node = left_node
+    
+    def add(self, node):
+        if self._head == None:
+            self.__init__(node)
+        else:
+            self._link_nodes(self._tail, node)
+            self._tail = self._tail.right_node
+            self._items.append(self._tail)
+    
+    # a generator for traversing the list from left to right
+    def traverse_right(self):
+        current_node = self._head
+        while current_node:
+            yield current_node
+            current_node = current_node.right_node
+    
+    # a generator for traversing the list from right to left
+    def traverse_left(self):
+        current_node = self._tail
+        while current_node:
+            yield current_node
+            current_node = current_node.left_node
+    
+    # remove a node from list
+    def remove(self, node_to_remove):
+        if node_to_remove:
+        
+            left_node = node_to_remove.left_node
+            
+            right_node = node_to_remove.right_node
+            
+            # if there is a left node
+            # set the right node of that left node
+            # to be the right node of current node
+            if left_node:
+                left_node.right_node = right_node
+            
+            # if there is a right node
+            # set the left node of that right node
+            # to be the left node of current node
+            if right_node:
+                right_node.left_node = left_node
+            
+            # delete the current node
+            del node_to_remove
+
+
 # helper functions
 def get_list_without_element_at_index(l, i):
     if i not in range(len(l)):
@@ -32,7 +157,7 @@ def get_element_frequency_dict(items):
     return d
 
 
-def remove(input_list, element_to_remove):
+def remove_element_with_value(input_list, element_to_remove):
     
     element_to_remove_indices_indices = []
     
@@ -45,6 +170,91 @@ def remove(input_list, element_to_remove):
         del input_list[index]
         
     return input_list
+
+
+def get_inverted_permutation(perm):
+    
+    inv_perm = [0] * len(perm)
+    
+    for i in range(len(perm)):
+        inv_perm[perm[i]] = i
+        
+    return inv_perm
+
+
+def get_duplicate_numbers(number):
+    
+    number_string = str(number)
+    start = -1
+    number_blocks = []
+    
+    for i in range(len(number_string) - 1):
+        
+        # if number repeated
+        if number_string[i] == number_string[i + 1]:
+            # set flag start at index i
+            if start == -1:
+                start = i
+        
+        # if number not repeated and flag start has already been set
+        elif start != -1:
+            # append the block of number from index start to index i + 1
+            number_blocks.append(''.join(number_string[start : i + 1]))
+            start = -1
+        
+        # use this block of code to check within the loop and not the for...else block
+        # if start != -1 and i == len(number_string) - 2:
+        #     number_blocks.append(''.join(number_string[start : i + 2]))
+        
+    else:
+        # this check for duplicate numbers that appear at the end
+        # if is at the end of string, and flag start has already been set
+        # we take the block of number from index start to index i + 2
+        if start != -1:
+            number_blocks.append(''.join(number_string[start : i + 2]))
+            
+    return number_blocks
+
+
+def get_distinct_numbers(number):
+    
+    number_string = str(number)
+    start = -1
+    number_blocks = []
+    
+    for i in range(len(number_string) - 1):
+        
+        # if number repeated
+        if number_string[i] == number_string[i + 1]:
+            # set flag start at index i
+            if start == -1:
+                start = i
+        
+        # if number not repeated and flag start has already been set
+        elif start != -1:
+            # append the block of number from index start to index i + 1
+            number_blocks.append(''.join(number_string[start : i + 1]))
+            start = -1
+        
+        # if number not repeated and flag has not been set
+        elif start == -1:
+            # append that number
+            number_blocks.append(number_string[i])
+        
+        # use this block of code to check within the loop and not the for...else block
+        # if start != -1 and i == len(number_string) - 2:
+        #     number_blocks.append(''.join(number_string[start : i + 2]))
+        
+    else:
+        # this check for duplicate numbers that appear at the end
+        # if is at the end of string, and flag start has already been set
+        # we take the block of number from index start to index i + 2
+        if start != -1:
+            number_blocks.append(''.join(number_string[start : i + 2]))
+        else:
+            number_blocks.append(number_string[i + 1])
+            
+    return number_blocks
 
 
 """
@@ -953,16 +1163,6 @@ def collect_numbers(perm):
     return count
 
 
-def get_inverted_permutation(perm):
-    
-    inv_perm = [0] * len(perm)
-    
-    for i in range(len(perm)):
-        inv_perm[perm[i]] = i
-        
-    return inv_perm
-
-
 """
 Between the soft and the NP-hard place - page 39
 """
@@ -1536,32 +1736,6 @@ def duplicate_digit_bonus(number):
     return score
 
 
-def get_duplicate_numbers(number):
-    
-    number_string = str(number)
-    start = -1
-    number_blocks = []
-    
-    for i in range(len(number_string) - 1):
-        
-        if number_string[i] == number_string[i + 1]:
-            if start == -1:
-                start = i
-                
-        elif start != -1:
-            number_blocks.append(''.join(number_string[start : i + 1]))
-            start = -1
-            
-        # if start != -1 and i == len(number_string) - 2:
-        #     number_blocks.append(''.join(number_string[start : i + 2]))        
-        
-    else:
-        if start != -1:
-            number_blocks.append(''.join(number_string[start : i + 2]))
-            
-    return number_blocks
-
-
 def calculate_score(duplicate_number):
     return 10 ** (len(duplicate_number) - 2)
 
@@ -1770,7 +1944,7 @@ def remove_after_kth(items, k=1):
             seen[items[i]] -= 1
             items[i] = None
             
-    return remove(items, None)
+    return remove_element_with_value(items, None)
 
 
 """
@@ -1932,6 +2106,175 @@ def first_preceded_by_smaller(items, k = 1):
                 return items[i]
     
     return None
+
+
+"""
+Crab bucket list - page 60
+"""
+
+# line 2587 in tester109
+# def eliminate_neighbours(items):
+    
+#     # handles length 1
+#     if len(items) < 2:
+#         return 1
+    
+#     index_nodes = []
+#     element_dict = {}
+#     current_smallest_item = 1
+#     largest_item = max(items)
+#     largest_seen = 1
+#     count = 0
+    
+#     # populate index nodes and 
+#     for i in range(len(items)):
+#         left_index = i - 1 if i - 1 >= 0 else None
+#         left_node = index_nodes[ left_index ] if left_index != None else None
+#         curr_node = Node( items[i] )
+#         curr_node.left_node = left_node
+        
+#         if left_node != None:
+#             left_node.right_node = curr_node
+            
+#         index_nodes.append( curr_node )
+        
+#         element_dict[ items[ i ] ] = {'index': i, 'seen': False}
+        
+#     while largest_seen != largest_item:
+        
+#         # remove biggest neighbor node
+#         current_smallest_item_node = index_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
+        
+#         left_node = current_smallest_item_node. left_node
+        
+#         right_node = current_smallest_item_node. right_node
+        
+#         biggest_neighbor_node = None
+        
+#         if not left_node:
+#             biggest_neighbor_node = right_node
+            
+#         elif not right_node:
+#             biggest_neighbor_node = left_node
+            
+#         else:
+#             biggest_neighbor_node = left_node if left_node. data > right_node. data else right_node
+#             # biggest_neighbor_node = left_node if left_node > right_node else right_node
+        
+#         if biggest_neighbor_node:
+#             largest_seen = biggest_neighbor_node. data
+#             element_dict[ largest_seen ][ 'seen' ] = True
+#             remove_node( biggest_neighbor_node )
+        
+#         # remove current smallest item
+#         element_dict[ current_smallest_item ][ 'seen' ] = True
+#         remove_node( current_smallest_item_node )
+        
+#         count += 1
+        
+#         if current_smallest_item == largest_item:
+#             break
+        
+#         while current_smallest_item < largest_item and element_dict[ current_smallest_item ][ 'seen' ] == True:
+#             current_smallest_item += 1
+        
+#     return count
+
+
+# def remove_node(curr_node):
+#     if curr_node:
+    
+#         left_node = curr_node.left_node
+        
+#         right_node = curr_node.right_node
+        
+#         # if there is a left node
+#         # set the right node of that left node
+#         # to be the right node of current node
+#         if left_node:
+#             left_node.right_node = right_node
+        
+#         # if there is a right node
+#         # set the left node of that right node
+#         # to be the left node of current node
+#         if right_node:
+#             right_node.left_node = left_node
+        
+#         # now we remove the connection of the
+#         # current node to its left and right nodes
+#         curr_node.left_node = None
+#         curr_node.right_node = None
+
+
+# line 2588 in tester109
+def eliminate_neighbours(items):
+    
+    # handles length 1
+    if len(items) < 2:
+        return 1
+    
+    item_value_nodes = DoublyLinkedList()
+    # index_nodes = []
+    element_dict = {}
+    current_smallest_item = 1
+    largest_item = max(items)
+    largest_seen = 1
+    count = 0
+    
+    # populate index nodes and position dictionary
+    for i in range(len(items)):
+        item_value_nodes.add(Node(items[i]))
+        element_dict[ items[ i ] ] = {'index': i, 'seen': False}
+        
+    while largest_seen < largest_item:
+        
+        # remove biggest neighbor node
+        current_smallest_item_node = item_value_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
+        
+        left_node = current_smallest_item_node. left_node
+        right_node = current_smallest_item_node. right_node
+        
+        biggest_neighbor_node = None
+        
+        if not left_node:
+            biggest_neighbor_node = right_node
+            
+        elif not right_node:
+            biggest_neighbor_node = left_node
+            
+        elif left_node and right_node:
+            biggest_neighbor_node = left_node if left_node. data > right_node. data else right_node
+        
+        if biggest_neighbor_node:
+            largest_seen = biggest_neighbor_node. data
+            # record the largest_seen as seen = True
+            element_dict[ largest_seen ][ 'seen' ] = True
+            item_value_nodes.remove( biggest_neighbor_node )
+        
+        # record the current_smallest_item as seen = True
+        element_dict[ current_smallest_item ][ 'seen' ] = True
+        # remove current smallest item
+        item_value_nodes.remove( current_smallest_item_node )
+        
+        count += 1
+        
+        if current_smallest_item == largest_item:
+            break
+        
+        # increment the smallest item until its value has not been seen in the record
+        while current_smallest_item < largest_item and element_dict[ current_smallest_item ][ 'seen' ] == True:
+            current_smallest_item += 1
+        
+    return count
+
+
+"""
+What do you hear, what do you say?
+"""
+
+
+def count_and_say(digits):
+    return ''.join([str(len(distinct_digit_block)) + distinct_digit_block[0] for distinct_digit_block in get_distinct_numbers(digits)])
 
 
 """

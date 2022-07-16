@@ -220,6 +220,8 @@ def test_one_function(f, test_cases, expected_checksum=None, recorder=None, expe
         elif crashed:
             return -1
         else:
+            # print('expected_checksum', expected_checksum)
+            # print('sha256 hexdigest', digest[:len(expected_checksum)])
             print("CHECKSUM MISMATCH: AT LEAST ONE ANSWER WAS WRONG.")
             print("YOUR FUNCTION HAS SOME EDGE CASE BUG THAT DID NOT MANIFEST")
             print(f"IN THE FIRST {testcase_cutoff} TEST CASES. IF YOU CAN'T FIND THIS")
@@ -2583,6 +2585,7 @@ testcases = [
      "eliminate_neighbours",
      eliminate_neighbours_generator(fixed_seed),
      "24333594d079471cf6696e8b660c11fc586029a178a9879c2349d154635c6aff"
+     # "29663fb89969eb1bf4f93d3a84d42f93c57290e97cd3785705e1f4081e3aeb84"
     ),
     (
      "counting_series",
@@ -2933,7 +2936,7 @@ def check_function(fname):
 
 # run_all()
 
-check_function('first_preceded_by_smaller')
+check_function('duplicate_digit_bonus')
 
 
 
