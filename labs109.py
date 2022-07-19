@@ -1,4 +1,4 @@
-import numpy
+import numpy, fractions, collections
 
 
 # helper classes
@@ -8,10 +8,13 @@ class Node:
         self._left_node = None
         self._right_node = None
         
-    @property
+    def __repr__(self):
+        return self._data
+        
+    @property       # getter
     def data(self):
         return self._data
-    @data.setter
+    @data.setter    # setter
     def data(self, data):
         self._data = data
     
@@ -1202,7 +1205,7 @@ def count_troikas(items):
     
     element_frequency_dict = get_element_index_dict(items)
     
-    print(element_frequency_dict)
+    # print(element_frequency_dict)
     
     troikas = 0
     
@@ -2269,12 +2272,231 @@ def eliminate_neighbours(items):
 
 
 """
-What do you hear, what do you say?
+What do you hear, what do you say? - page 61
 """
 
 
 def count_and_say(digits):
     return ''.join([str(len(distinct_digit_block)) + distinct_digit_block[0] for distinct_digit_block in get_distinct_numbers(digits)])
+
+
+"""
+Bishops on a binge
+"""
+
+# not completed
+def safe_squares_bishops(n, bishops):
+    return
+
+
+"""
+Dem’s some mighty tall words, pardner
+"""
+
+# not completed
+def word_height(words, word):
+    return
+
+
+"""
+Up for the count
+"""
+
+# not completed
+get_number_of_digit = lambda lower_bound, upper_bound, power : (upper_bound - lower_bound) * power
+
+
+def counting_series(n):
+    #                                                                                       This is where index n is in
+    #                                                                                                   |
+    #     lower            upper                                                    power               |
+    #       |                |                                                        |                 |
+    #       v                v                                                        v                 v
+    # range(         1   -            10)             -> 9 numbers            -> 9   * 1     digits =           9 digits
+    # range(        10   -           100)            -> 90 numbers           -> 90   * 2     digits =         180 digits
+    # range(       100   -          1000)           -> 900 numbers          -> 900   * 3     digits =        2700 digits
+    # range(      1000   -         10000)          -> 9000 numbers         -> 9000   * 4     digits =       36000 digits
+    # range(     10000   -        100000)         -> 90000 numbers        -> 90000   * 5     digits =      450000 digits
+    # range(    100000   -       1000000)        -> 900000 numbers       -> 900000   * 6     digits =     5400000 digits
+    # range(   1000000   -      10000000)       -> 9000000 numbers      -> 9000000   * 7     digits =    63000000 digits
+    # range(  10000000   -     100000000)      -> 90000000 numbers     -> 90000000   * 8     digits =   720000000 digits
+    # range( 100000000   -    1000000000)     -> 900000000 numbers    -> 900000000   * 9     digits =  8100000000 digits
+    # range(1000000000   -   10000000000)    -> 9000000000 numbers   -> 9000000000   * 10    digits = 90000000000 digits
+    
+    total_digits = 0
+    power = 0
+    lower_bound, upper_bound = 0, 0
+    num_of_digit_lower, num_of_digit_upper = 0, 0
+    
+    while num_of_digit_upper < n:
+        power += 1
+        lower_bound = 10 ** power
+        upper_bound = 10 ** (power + 1)
+        num_of_digit_lower = get_number_of_digit(lower_bound // 10, upper_bound // 10, power)
+        num_of_digit_upper = get_number_of_digit(lower_bound, upper_bound, power + 1)
+        
+        total_digits += num_of_digit_lower
+    
+    num_count = (n - total_digits) // power
+    
+    # number of digits = (upper - lower) * power
+    # e = (10 ^ (p + 1) - 10 ^ p) * p
+    
+    # print(f'index {n} belongs to number in range {lower_bound} - {upper_bound}')
+    # print(f'{num_of_digit_lower} - {num_of_digit_upper}')
+    # print(f'num_count with power {power}: {num_count}')
+    # print(f'total_digits below n {total_digits + num_count * power}')   
+
+    s = '123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100'
+    
+    digit_count = 1
+    power = 1
+    i = 1
+    while i < len(s) + 1:
+        if i == 10 ** power:
+            digit_count += 1
+            
+        # print(f'i = {i}\tnum = {s[i - 1 : i + digit_count - 1]}')
+        
+        i += digit_count
+    
+    return
+
+
+# counting_series(10)
+
+# print('99')
+# # power 2
+# print(s[187])
+# print(s[188])
+# print('100')
+# # power 3
+# print(s[189])
+# print(s[190])
+# print(s[191])
+
+# print(s[-3:])
+# print(s[-3-2:-3])
+# print(s[-3-2-2:-3-2])
+
+
+"""
+Revorse the vewels
+"""
+
+
+def reverse_vowels(text):
+    vowels = 'aeiouAEIOU'
+    vowels_in_text = []
+    upper_case_position = []
+    result = ''
+    
+    for i in range(len(text)):
+        if text[i] in vowels:
+            vowels_in_text.append(text[i])
+            if text[i].isupper():    
+                upper_case_position.append(i)
+    
+    for i in range(len(text)):
+        if text[i] in vowels:
+            char_to_add = vowels_in_text.pop(len(vowels_in_text) - 1)
+            is_upper = i in upper_case_position
+            result += char_to_add.upper() if is_upper else char_to_add.lower()
+        else:
+            result += text[i]
+    
+    return result
+
+
+"""
+Everybody on the floor, come do the Scrooge Shuffle
+"""
+
+# not completed
+def spread_the_coins(coins, left, right):
+    return
+
+
+"""
+Rational lines of action
+"""
+
+
+def calkin_wilf(n):
+
+    calkin_wilf_queue = collections.deque()
+    calkin_wilf_queue.append(fractions.Fraction(1, 1))
+    
+    
+    count = 1
+    while count <= n:
+        
+        fraction = calkin_wilf_queue.popleft()
+        
+        f1 = fractions.Fraction(fraction.numerator, fraction.numerator + fraction.denominator)
+        f2 = fractions.Fraction(fraction.numerator + fraction.denominator, fraction.denominator)
+        calkin_wilf_queue.append(f1)
+        count += 1
+        if count == n:
+            return f1
+        calkin_wilf_queue.append(f2)
+        count += 1
+        if count == n:
+            return f2
+        
+    return 'Should not reach here... also, second example test case is WRONG!!!!!!!!! 10000 will yield 43/205, NOT 11/39... to get that, we need n = 1000'
+
+
+"""
+Verbos regulares
+"""
+
+# not completed
+def conjugate_regular(verb, subject, tense):
+    return
+
+
+"""
+Hippity hoppity, abolish loopity
+"""
+
+
+def frog_collision_time(frog1, frog2):
+    # position met = sx + t * dx, sy + t * dy
+    # t = (sx1 - sx2) / (dx2 - dx1)
+    # t = (sy1 - sy2) / (dy2 - dy1)
+    # (sx1 - sx2) * (dy2 - dy1) = (sy1 - sy2) * (dx2 - dx1)
+    
+    if not can_meet(frog1, frog2):
+        return None
+        
+    pos1 = (frog1[0], frog1[1])
+    dir1 = (frog1[2], frog1[3])
+    pos2 = (frog2[0], frog2[1])
+    dir2 = (frog2[2], frog2[3])
+    
+    t = 0
+    
+    try:
+        t = (pos1[0] - pos2[0]) // (dir2[0] - dir1[0])
+    except: pass
+
+    try:
+        t = (pos1[1] - pos2[1]) // (dir2[1] - dir1[1])
+    except: pass
+
+    return t if t > 0 else None
+
+
+def can_meet(frog1, frog2):
+    # t = (sx1 - sx2) / (dx2 - dx1)
+    # t = (sy1 - sy2) / (dy2 - dy1)
+    # (sx1 - sx2) * (dy2 - dy1) = (sy1 - sy2) * (dx2 - dx1)
+    print('can meet')
+    return (frog1[0] - frog2[0]) * (frog2[3] - frog1[3]) == (frog1[1] - frog2[1]) * (frog2[2] - frog1[2])
+
+
+print(can_meet( (-17, -3, -2, -3), (-1, -3, -8, -3) ) )
 
 
 """

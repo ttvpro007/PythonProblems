@@ -2936,7 +2936,7 @@ def check_function(fname):
 
 # run_all()
 
-check_function('duplicate_digit_bonus')
+check_function('frog_collision_time')
 
 
 
