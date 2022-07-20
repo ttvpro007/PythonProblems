@@ -1,4 +1,4 @@
-import numpy, fractions, collections
+import numpy, fractions, collections, bisect
 
 
 # helper classes
@@ -2116,125 +2116,40 @@ Crab bucket list - page 60
 """
 
 # line 2587 in tester109
-# def eliminate_neighbours(items):
-    
-#     # handles length 1
-#     if len(items) < 2:
-#         return 1
-    
-#     index_nodes = []
-#     element_dict = {}
-#     current_smallest_item = 1
-#     largest_item = max(items)
-#     largest_seen = 1
-#     count = 0
-    
-#     # populate index nodes and 
-#     for i in range(len(items)):
-#         left_index = i - 1 if i - 1 >= 0 else None
-#         left_node = index_nodes[ left_index ] if left_index != None else None
-#         curr_node = Node( items[i] )
-#         curr_node.left_node = left_node
-        
-#         if left_node != None:
-#             left_node.right_node = curr_node
-            
-#         index_nodes.append( curr_node )
-        
-#         element_dict[ items[ i ] ] = {'index': i, 'seen': False}
-        
-#     while largest_seen != largest_item:
-        
-#         # remove biggest neighbor node
-#         current_smallest_item_node = index_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
-        
-#         left_node = current_smallest_item_node. left_node
-        
-#         right_node = current_smallest_item_node. right_node
-        
-#         biggest_neighbor_node = None
-        
-#         if not left_node:
-#             biggest_neighbor_node = right_node
-            
-#         elif not right_node:
-#             biggest_neighbor_node = left_node
-            
-#         else:
-#             biggest_neighbor_node = left_node if left_node. data > right_node. data else right_node
-#             # biggest_neighbor_node = left_node if left_node > right_node else right_node
-        
-#         if biggest_neighbor_node:
-#             largest_seen = biggest_neighbor_node. data
-#             element_dict[ largest_seen ][ 'seen' ] = True
-#             remove_node( biggest_neighbor_node )
-        
-#         # remove current smallest item
-#         element_dict[ current_smallest_item ][ 'seen' ] = True
-#         remove_node( current_smallest_item_node )
-        
-#         count += 1
-        
-#         if current_smallest_item == largest_item:
-#             break
-        
-#         while current_smallest_item < largest_item and element_dict[ current_smallest_item ][ 'seen' ] == True:
-#             current_smallest_item += 1
-        
-#     return count
-
-
-# def remove_node(curr_node):
-#     if curr_node:
-    
-#         left_node = curr_node.left_node
-        
-#         right_node = curr_node.right_node
-        
-#         # if there is a left node
-#         # set the right node of that left node
-#         # to be the right node of current node
-#         if left_node:
-#             left_node.right_node = right_node
-        
-#         # if there is a right node
-#         # set the left node of that right node
-#         # to be the left node of current node
-#         if right_node:
-#             right_node.left_node = left_node
-        
-#         # now we remove the connection of the
-#         # current node to its left and right nodes
-#         curr_node.left_node = None
-#         curr_node.right_node = None
-
-
-# line 2588 in tester109
 def eliminate_neighbours(items):
     
     # handles length 1
     if len(items) < 2:
         return 1
     
-    item_value_nodes = DoublyLinkedList()
-    # index_nodes = []
+    index_nodes = []
     element_dict = {}
     current_smallest_item = 1
     largest_item = max(items)
     largest_seen = 1
     count = 0
     
-    # populate index nodes and position dictionary
+    # populate index nodes and 
     for i in range(len(items)):
-        item_value_nodes.add(Node(items[i]))
+        left_index = i - 1 if i - 1 >= 0 else None
+        left_node = index_nodes[ left_index ] if left_index != None else None
+        curr_node = Node( items[i] )
+        curr_node.left_node = left_node
+        
+        if left_node != None:
+            left_node.right_node = curr_node
+            
+        index_nodes.append( curr_node )
+        
         element_dict[ items[ i ] ] = {'index': i, 'seen': False}
         
-    while largest_seen < largest_item:
+    while largest_seen != largest_item:
         
         # remove biggest neighbor node
-        current_smallest_item_node = item_value_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
+        current_smallest_item_node = index_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
         
         left_node = current_smallest_item_node. left_node
+        
         right_node = current_smallest_item_node. right_node
         
         biggest_neighbor_node = None
@@ -2245,30 +2160,115 @@ def eliminate_neighbours(items):
         elif not right_node:
             biggest_neighbor_node = left_node
             
-        elif left_node and right_node:
+        else:
             biggest_neighbor_node = left_node if left_node. data > right_node. data else right_node
+            # biggest_neighbor_node = left_node if left_node > right_node else right_node
         
         if biggest_neighbor_node:
             largest_seen = biggest_neighbor_node. data
-            # record the largest_seen as seen = True
             element_dict[ largest_seen ][ 'seen' ] = True
-            item_value_nodes.remove( biggest_neighbor_node )
+            remove_node( biggest_neighbor_node )
         
-        # record the current_smallest_item as seen = True
-        element_dict[ current_smallest_item ][ 'seen' ] = True
         # remove current smallest item
-        item_value_nodes.remove( current_smallest_item_node )
+        element_dict[ current_smallest_item ][ 'seen' ] = True
+        remove_node( current_smallest_item_node )
         
         count += 1
         
         if current_smallest_item == largest_item:
             break
         
-        # increment the smallest item until its value has not been seen in the record
         while current_smallest_item < largest_item and element_dict[ current_smallest_item ][ 'seen' ] == True:
             current_smallest_item += 1
         
     return count
+
+
+def remove_node(curr_node):
+    if curr_node:
+    
+        left_node = curr_node.left_node
+        
+        right_node = curr_node.right_node
+        
+        # if there is a left node
+        # set the right node of that left node
+        # to be the right node of current node
+        if left_node:
+            left_node.right_node = right_node
+        
+        # if there is a right node
+        # set the left node of that right node
+        # to be the left node of current node
+        if right_node:
+            right_node.left_node = left_node
+        
+        # now we remove the connection of the
+        # current node to its left and right nodes
+        curr_node.left_node = None
+        curr_node.right_node = None
+
+
+# line 2588 in tester109
+# def eliminate_neighbours(items):
+    
+#     # handles length 1
+#     if len(items) < 2:
+#         return 1
+    
+#     item_value_nodes = DoublyLinkedList()
+#     # index_nodes = []
+#     element_dict = {}
+#     current_smallest_item = 1
+#     largest_item = max(items)
+#     largest_seen = 1
+#     count = 0
+    
+#     # populate index nodes and position dictionary
+#     for i in range(len(items)):
+#         item_value_nodes.add(Node(items[i]))
+#         element_dict[ items[ i ] ] = {'index': i, 'seen': False}
+        
+#     while largest_seen < largest_item:
+        
+#         # remove biggest neighbor node
+#         current_smallest_item_node = item_value_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
+        
+#         left_node = current_smallest_item_node. left_node
+#         right_node = current_smallest_item_node. right_node
+        
+#         biggest_neighbor_node = None
+        
+#         if not left_node:
+#             biggest_neighbor_node = right_node
+            
+#         elif not right_node:
+#             biggest_neighbor_node = left_node
+            
+#         elif left_node and right_node:
+#             biggest_neighbor_node = left_node if left_node. data > right_node. data else right_node
+        
+#         if biggest_neighbor_node:
+#             largest_seen = biggest_neighbor_node. data
+#             # record the largest_seen as seen = True
+#             element_dict[ largest_seen ][ 'seen' ] = True
+#             item_value_nodes.remove( biggest_neighbor_node )
+        
+#         # record the current_smallest_item as seen = True
+#         element_dict[ current_smallest_item ][ 'seen' ] = True
+#         # remove current smallest item
+#         item_value_nodes.remove( current_smallest_item_node )
+        
+#         count += 1
+        
+#         if current_smallest_item == largest_item:
+#             break
+        
+#         # increment the smallest item until its value has not been seen in the record
+#         while current_smallest_item < largest_item and element_dict[ current_smallest_item ][ 'seen' ] == True:
+#             current_smallest_item += 1
+        
+#     return count
 
 
 """
@@ -2281,7 +2281,7 @@ def count_and_say(digits):
 
 
 """
-Bishops on a binge
+Bishops on a binge - page 62
 """
 
 # not completed
@@ -2290,16 +2290,41 @@ def safe_squares_bishops(n, bishops):
 
 
 """
-Dem’s some mighty tall words, pardner
+Dem’s some mighty tall words, pardner - page 63
 """
 
 # not completed
 def word_height(words, word):
-    return
+
+    for i in range(1, len(word)):
+        
+        left_word = word[:i]
+        left_word_index = bisect.bisect_left(words, left_word)
+        right_word = word[i:]
+        right_word_index = bisect.bisect_left(words, right_word)
+        
+        if left_word == words[left_word_index] and right_word == words[right_word_index]:
+            
+            left_height = word_height(words, left_word)
+            right_height = word_height(words, right_word)
+            
+            height = max(left_height, right_height) + 1
+            
+            return height
+    
+    word_index = bisect.bisect_left(words, word)
+    if word == words[word_index]:
+        height = 1
+        return height
+    else:
+        height = 0
+        return height
+    
+    return None
 
 
 """
-Up for the count
+Up for the count - page 64
 """
 
 # not completed
@@ -2381,7 +2406,7 @@ def counting_series(n):
 
 
 """
-Revorse the vewels
+Revorse the vewels - page 65
 """
 
 
@@ -2409,7 +2434,7 @@ def reverse_vowels(text):
 
 
 """
-Everybody on the floor, come do the Scrooge Shuffle
+Everybody on the floor, come do the Scrooge Shuffle - page 66
 """
 
 # not completed
@@ -2418,7 +2443,7 @@ def spread_the_coins(coins, left, right):
 
 
 """
-Rational lines of action
+Rational lines of action - page 67
 """
 
 
@@ -2448,7 +2473,7 @@ def calkin_wilf(n):
 
 
 """
-Verbos regulares
+Verbos regulares - page 68
 """
 
 # not completed
@@ -2457,12 +2482,12 @@ def conjugate_regular(verb, subject, tense):
 
 
 """
-Hippity hoppity, abolish loopity
+Hippity hoppity, abolish loopity - page 69
 """
 
 
 def frog_collision_time(frog1, frog2):
-    # position met = sx + t * dx, sy + t * dy
+    # meet up position = sx + t * dx, sy + t * dy
     # t = (sx1 - sx2) / (dx2 - dx1)
     # t = (sy1 - sy2) / (dy2 - dy1)
     # (sx1 - sx2) * (dy2 - dy1) = (sy1 - sy2) * (dx2 - dx1)
@@ -2492,11 +2517,53 @@ def can_meet(frog1, frog2):
     # t = (sx1 - sx2) / (dx2 - dx1)
     # t = (sy1 - sy2) / (dy2 - dy1)
     # (sx1 - sx2) * (dy2 - dy1) = (sy1 - sy2) * (dx2 - dx1)
-    print('can meet')
     return (frog1[0] - frog2[0]) * (frog2[3] - frog1[3]) == (frog1[1] - frog2[1]) * (frog2[2] - frog1[2])
 
 
-print(can_meet( (-17, -3, -2, -3), (-1, -3, -8, -3) ) )
+"""
+Where no one can hear you bounce - page 70
+"""
+
+
+def reach_corner(x, y, n, m, aliens):
+        
+    
+    # n is number of vertical squares
+    # m is number of horizontal squares
+    corners = [(0, 0), (0, n - 1), (0, m - 1), (n - 1, m - 1)]
+    
+    # vector = target - origin
+    vectors_to_coners = [(c[0] - x, c[1] - y) for c in corners]
+    vectors_to_aliens = [(a[0] - x, a[1] - y) for a in aliens]
+    
+    # print(f'corners vectors: {vectors_to_coners}')
+    # print(f'aliens vectors: {vectors_to_aliens}')
+    
+    # can_go_to_corner = False
+    
+    for c_vector in vectors_to_coners:
+        print(c_vector)
+        if is_diagonal_direction(c_vector):
+            if len(aliens) == 0:
+                print(c_vector)
+                return True
+            
+            for a_vector in vectors_to_aliens:
+                cross = numpy.cross(c_vector, a_vector)
+                if cross != 0:
+                    return True
+            
+    return False
+
+
+def is_diagonal_direction(v):
+    return abs(v[0]) == abs(v[1]) != 0
+
+# print(numpy.cross( (7, -7), (1, -1) ) )
+
+
+
+print(reach_corner( 1, 1, 4, 5, [(0, 4), (3, 4), (3, 0)] ) )
 
 
 """

@@ -2936,7 +2936,7 @@ def check_function(fname):
 
 # run_all()
 
-check_function('frog_collision_time')
+check_function('reach_corner')
 
 
 
