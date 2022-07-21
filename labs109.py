@@ -2525,45 +2525,161 @@ Where no one can hear you bounce - page 70
 """
 
 
-def reach_corner(x, y, n, m, aliens):
+def reach_corner(x, y, n, m, aliens, debug = False):
+
+    corners = [(0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1)]
+    
+    if debug:
+        print(f'\ncorners are {corners}')
+        print(f'aliens are {aliens}')
+        print(f'board dimension is {n} x {m}')
         
+        print(f"bishop's position is at {x, y}")
     
-    # n is number of vertical squares
-    # m is number of horizontal squares
-    corners = [(0, 0), (0, n - 1), (0, m - 1), (n - 1, m - 1)]
+    corners_info = [ {
+        'point'             : c,
+        'alien blocking'    : None 
+        } for c in corners ]
     
-    # vector = target - origin
-    vectors_to_coners = [(c[0] - x, c[1] - y) for c in corners]
-    vectors_to_aliens = [(a[0] - x, a[1] - y) for a in aliens]
+    aliens_info = [ {
+        'point'             : a,
+        'blocking corner'   : None
+        } for a in aliens  ]
     
-    # print(f'corners vectors: {vectors_to_coners}')
-    # print(f'aliens vectors: {vectors_to_aliens}')
-    
-    # can_go_to_corner = False
-    
-    for c_vector in vectors_to_coners:
-        print(c_vector)
-        if is_diagonal_direction(c_vector):
-            if len(aliens) == 0:
-                print(c_vector)
+    for i in range(len(corners_info)):
+        
+        vector_to_corner = to_vector_2D( corners_info[i]['point'], (x, y) )
+        
+        if is_diagonal_direction(vector_to_corner):
+            
+            if debug:
+                print(f"bishop {x, y} can move to point {corners_info[i]['point']}")
+            
+            # if no alien when we have valid corner
+            if aliens == []:
+                if debug:
+                    print(corners_info)
+                    print('1 return here')
                 return True
             
-            for a_vector in vectors_to_aliens:
-                cross = numpy.cross(c_vector, a_vector)
-                if cross != 0:
-                    return True
-            
+            for j in range(len(aliens_info)):
+                
+                if aliens_info[j]['blocking corner']:
+                    continue
+                
+                if corners_info[i]['alien blocking']:
+                    continue
+                
+                vector_to_alien = to_vector_2D( aliens_info[j]['point'], (x, y) )
+                if is_same_direction(vector_to_corner, vector_to_alien):
+                    aliens_info[j]['blocking corner'] = corners_info[i]['point']
+                    corners_info[i]['alien blocking'] = aliens_info[j]['point']
+                    
+        elif debug:
+            print(f"bishop {x, y} cannot move to point {corners_info[i]['point']}")
+    
+    # check if we have any corner left unblocked
+    # if yes, we return True
+    for i in range(len(corners_info)):
+        
+        vector_to_corner = to_vector_2D( corners_info[i]['point'], (x, y) )
+        
+        if is_diagonal_direction(vector_to_corner) and not corners_info[i]['alien blocking']:
+            if debug:
+                print(corners_info)
+                print('2 return here')
+            return True
+    if debug:
+        print(corners_info)
+        print('3 return here')
     return False
 
 
-def is_diagonal_direction(v):
-    return abs(v[0]) == abs(v[1]) != 0
-
-# print(numpy.cross( (7, -7), (1, -1) ) )
+def to_vector_2D(origin_point, target_point):
+    return (target_point[0] - origin_point[0], target_point[1] - origin_point[1])
 
 
+def to_point_2D(origin_point, target_point):
+    return (target_point[0] - origin_point[0], target_point[1] - origin_point[1])
 
-print(reach_corner( 1, 1, 4, 5, [(0, 4), (3, 4), (3, 0)] ) )
+
+def is_diagonal_direction(vector):
+    return abs(vector[0]) == abs(vector[1]) != 0
+
+
+def is_same_direction(vector1, vector2):
+    cross_product = numpy.cross(vector1, vector2)
+    # print(f'cross_product of vector1 {vector1} and vector2 {vector2} is {cross_product}')
+    return cross_product == 0
+
+
+# print(reach_corner( 0, 2, 5, 5, [], debug = True ) )
+# print(reach_corner( 4, 4, 9, 9, [(0, 0), (0, 8), (8, 0), (8, 8)], debug = True ) )
+# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 0)], debug = True ) )
+# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)], debug = True ) )
+# print(reach_corner( 3, 2, 4, 4, [(1, 2), (0, 1)], debug = True ) )
+# print(reach_corner( 3, 2, 5, 4, [(2, 2), (1, 4)], debug = True ) )
+
+# print(reach_corner( 0, 2, 5, 5, [], debug = False ) )
+# print(reach_corner( 4, 4, 9, 9, [(0, 0), (0, 8), (8, 0), (8, 8)], debug = False ) )
+# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 0)], debug = False ) )
+# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)], debug = False ) )
+# print(reach_corner( 3, 2, 4, 4, [(1, 2), (0, 1)], debug = False ) )
+# print(reach_corner( 3, 2, 5, 4, [(2, 2), (1, 4)], debug = False ) )
+
+
+"""
+Nearest polygonal number
+"""
+
+
+# ( (s-2) * i * i - (s-4) * i ) / 2
+
+def nearest_polygonal_number(n, s):
+    
+    lo, hi = 1, 1
+    polynum = calculate_polynum(s, (lo + hi) // 2)
+    
+    while polynum < n:
+        hi *= 2
+        print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
+        polynum = calculate_polynum(s, (lo + hi) // 2)
+        print('1', polynum)
+        
+    hi //= 2
+    polynum = calculate_polynum(s, (lo + hi) // 2)
+    
+    while polynum < n:
+        lo *= 2
+        print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
+        polynum = calculate_polynum(s, (lo + hi) // 2)
+        print('2', polynum)
+        
+    lo //= 2
+    
+    while lo < hi:
+        i = (lo + hi) // 2
+        print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
+        polynum = calculate_polynum(s, i)
+        print('3', polynum)
+        if polynum == n:
+            return polynum
+        if polynum > n:
+            lo += 1
+        else:
+            hi -= 1
+    
+    return polynum
+
+
+def calculate_polynum(s, i):
+    return ( (s - 2) * i * i - (s - 4) * i ) // 2
+
+# print(nearest_polygonal_number(5, 3))
+# print(nearest_polygonal_number(27, 4))
+print(nearest_polygonal_number(450, 9))
+# print(nearest_polygonal_number(10**10, 42))
+# print(nearest_polygonal_number(10**100, 91))
 
 
 """

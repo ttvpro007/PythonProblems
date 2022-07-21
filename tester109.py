@@ -2938,6 +2938,3 @@ def check_function(fname):
 
 check_function('reach_corner')
 
-
-
-
