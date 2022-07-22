@@ -357,13 +357,10 @@ Colour trio - page 16
 def colour_trio(colours):
     if len(colours) <= 1:
         return colours
-    
     new_colour = ''
     for i in range(len(colours) - 1):
         new_colour += get_mixed_colour(colours[i], colours[i + 1])
-        
     return colour_trio(new_colour)
-
 
 def get_mixed_colour(colour1, colour2):
     if colour1 == colour2:
@@ -2524,7 +2521,7 @@ def can_meet(frog1, frog2):
 Where no one can hear you bounce - page 70
 """
 
-
+# not completed
 def reach_corner(x, y, n, m, aliens, debug = False):
 
     corners = [(0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1)]
@@ -2550,6 +2547,7 @@ def reach_corner(x, y, n, m, aliens, debug = False):
         
         vector_to_corner = to_vector_2D( corners_info[i]['point'], (x, y) )
         
+        # bishop can only move diagonally
         if is_diagonal_direction(vector_to_corner):
             
             if debug:
@@ -2575,6 +2573,9 @@ def reach_corner(x, y, n, m, aliens, debug = False):
                     aliens_info[j]['blocking corner'] = corners_info[i]['point']
                     corners_info[i]['alien blocking'] = aliens_info[j]['point']
                     
+                    if debug:
+                        print(f"---bishop {x, y} can move to point {corners_info[i]['point']}")
+
         elif debug:
             print(f"bishop {x, y} cannot move to point {corners_info[i]['point']}")
     
@@ -2595,6 +2596,7 @@ def reach_corner(x, y, n, m, aliens, debug = False):
     return False
 
 
+# helpers
 def to_vector_2D(origin_point, target_point):
     return (target_point[0] - origin_point[0], target_point[1] - origin_point[1])
 
@@ -2604,8 +2606,11 @@ def to_point_2D(origin_point, target_point):
 
 
 def is_diagonal_direction(vector):
-    return abs(vector[0]) == abs(vector[1]) != 0
-
+    print('\tx', vector[0])
+    print('\ty', vector[1])
+    r = abs(vector[0]) == abs(vector[1]) != 0
+    print('is diagonal', r)
+    return r
 
 def is_same_direction(vector1, vector2):
     cross_product = numpy.cross(vector1, vector2)
@@ -2629,12 +2634,10 @@ def is_same_direction(vector1, vector2):
 
 
 """
-Nearest polygonal number
+Nearest polygonal number - page 71
 """
 
-
-# ( (s-2) * i * i - (s-4) * i ) / 2
-
+# not completed
 def nearest_polygonal_number(n, s):
     
     lo, hi = 1, 1
@@ -2677,9 +2680,35 @@ def calculate_polynum(s, i):
 
 # print(nearest_polygonal_number(5, 3))
 # print(nearest_polygonal_number(27, 4))
-print(nearest_polygonal_number(450, 9))
+# print(nearest_polygonal_number(450, 9))
 # print(nearest_polygonal_number(10**10, 42))
 # print(nearest_polygonal_number(10**100, 91))
+
+
+"""
+Don’t worry, we will fix it in the post - page 72
+"""
+
+
+def postfix_evaluate(items):
+    # print(eval(items))
+    ops = []
+    nums = []
+
+    for item in items:
+        if type(item) == str:
+            ops.append(item)
+        else:
+            nums.append(item)
+
+    e = ''
+    for i in range(nums):
+        return
+
+    return
+
+
+# postfix_evaluate([2, 3, '+', 4, '*'])
 
 
 """

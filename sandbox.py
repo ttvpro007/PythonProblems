@@ -1,3 +1,4 @@
+from http.server import executable
 import os
 import re
 
@@ -262,10 +263,13 @@ def count(x, terminating_condition, step):
 # print(count(10, 1, 1))
 
 
-from hashlib import sha256
+# from hashlib import sha256
 
-chk = sha256()
-chk.update(str(750).encode('utf-8'))
-digest = chk.hexdigest()
-print(digest[:])
+# chk = sha256()
+# chk.update(str(750).encode('utf-8'))
+# digest = chk.hexdigest()
+# print(digest[:])
 
+# import sys
+
+# print(sys.executable)

@@ -2932,9 +2932,7 @@ def check_function(fname):
 
 
 
-
-
 # run_all()
 
-check_function('reach_corner')
+check_function('three_summers')
 
