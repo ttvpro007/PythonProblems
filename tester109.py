@@ -2926,13 +2926,18 @@ def get_testcases_details(fname):
 
 # Check one function with expected answer
 def check_function(fname):
+    
+    if fname == '':
+        return
+    
     print(f"Attempting to test function '{fname}' in module labs109...")
     f, testcases_, expected_checksum_ = get_testcases_details(fname)
     test_one_function(f, testcases_, expected_checksum_, expected_answers=import_answer_for(fname))
 
 
-
 # run_all()
 
-check_function('three_summers')
+function_to_check = 'brangelina'
+
+check_function(function_to_check)
 

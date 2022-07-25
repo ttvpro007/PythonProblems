@@ -1,4 +1,5 @@
-import numpy, fractions, collections, bisect
+import numpy, fractions, collections, bisect, itertools
+from operator import add, sub, mul, floordiv
 
 
 # helper classes
@@ -130,6 +131,32 @@ class DoublyLinkedList:
 
 
 # helper functions
+# https://geekflare.com/prime-number-in-python/
+def is_prime(n):
+  for i in range( 2, int( numpy.sqrt( n ) ) + 1 ):
+    if n % i == 0:
+      return False
+  return True
+
+
+def prime_factorize(n):
+    p = 2
+    t = n
+    primes = {}
+    primes_product = 1
+    while n > primes_product:
+        if t % p == 0:
+            t /= p
+            if p not in primes:
+                primes[p] = 1
+            else:
+                primes[p] += 1
+            primes_product *= p
+        else:
+            p += 1
+    return primes
+
+
 def get_list_without_element_at_index(l, i):
     if i not in range(len(l)):
         raise IndexError
@@ -185,79 +212,107 @@ def get_inverted_permutation(perm):
     return inv_perm
 
 
-def get_duplicate_numbers(number):
+def flatten_2D_list(list_2D):
+    return list(itertools.chain.from_iterable(list_2D))
+
+
+# works for conditions that compare consecutive items (e.g. items[i] and items[i + 1]) with each other
+def get_consectutive_items_with_condition(items, condition, take_all = False):
     
-    number_string = str(number)
     start = -1
-    number_blocks = []
+    sublists = []
     
-    for i in range(len(number_string) - 1):
+    for i in range(len(items) - 1):
         
-        # if number repeated
-        if number_string[i] == number_string[i + 1]:
+        # if condition is satisfied
+        if condition(items[i], items[i + 1]):
             # set flag start at index i
             if start == -1:
                 start = i
         
-        # if number not repeated and flag start has already been set
+        # if flag start has already been set
+        # and condition is not satisfied
         elif start != -1:
-            # append the block of number from index start to index i + 1
-            number_blocks.append(''.join(number_string[start : i + 1]))
+            # append the block of item from index start to index i + 1
+            sublists.append(items[start : i + 1])
+            # reset flag start
             start = -1
         
+        # if flag has not been set
+        # and condition is not satisfied
+        # elif start == -1 and take_all:
+        elif start == -1 and take_all:
+            # append that item as the sublist
+            sublists.append([items[i]])
+        
         # use this block of code to check within the loop and not the for...else block
-        # if start != -1 and i == len(number_string) - 2:
-        #     number_blocks.append(''.join(number_string[start : i + 2]))
+        # if start != -1 and i == len(items) - 2:
+        #     sublists.append(items[start : i + 2])
         
     else:
-        # this check for duplicate numbers that appear at the end
-        # if is at the end of string, and flag start has already been set
+        # this check for item that appear at the end of the list
+        # if flag start has already been set
         # we take the block of number from index start to index i + 2
         if start != -1:
-            number_blocks.append(''.join(number_string[start : i + 2]))
+            sublists.append(items[start : i + 2])
+        # if flag start has not been set
+        elif take_all:
+            sublists.append([items[i + 1]])
             
-    return number_blocks
+    return sublists
 
 
-def get_distinct_numbers(number):
+# condition for get_consectutive_items_with_condition
+def is_equal(a, b):
+    return a == b
+
+
+# condition for get_consectutive_items_with_condition
+def is_smaller(a, b):
+    return a < b
+
+
+def get_sublists_with_condition(items, condition, take_all = False):
     
-    number_string = str(number)
     start = -1
-    number_blocks = []
+    sublists = []
     
-    for i in range(len(number_string) - 1):
-        
-        # if number repeated
-        if number_string[i] == number_string[i + 1]:
+    for i in range(len(items)):
+        # if condition is satisfied
+        if condition(items[i]):
             # set flag start at index i
             if start == -1:
                 start = i
         
-        # if number not repeated and flag start has already been set
+        # if flag start has already been set
+        # and condition is not satisfied
         elif start != -1:
-            # append the block of number from index start to index i + 1
-            number_blocks.append(''.join(number_string[start : i + 1]))
+            # append the block of item from index start to index i
+            sublists.append(items[start : i])
+            # reset flag start
             start = -1
         
-        # if number not repeated and flag has not been set
-        elif start == -1:
-            # append that number
-            number_blocks.append(number_string[i])
+        # if flag has not been set
+        # and condition is not satisfied
+        if start == -1 and take_all:
+            # append that item as the sublist
+            sublists.append(items[i])
         
         # use this block of code to check within the loop and not the for...else block
-        # if start != -1 and i == len(number_string) - 2:
-        #     number_blocks.append(''.join(number_string[start : i + 2]))
+        # if start != -1 and i == len(items) - 1:
+        #     sublists.append(items[start : i + 1])
         
     else:
-        # this check for duplicate numbers that appear at the end
-        # if is at the end of string, and flag start has already been set
-        # we take the block of number from index start to index i + 2
+        # this check for item that appear at the end of the list
+        # if flag start has already been set
+        # we take the block of number from index start to index i + 1
         if start != -1:
-            number_blocks.append(''.join(number_string[start : i + 2]))
-        else:
-            number_blocks.append(number_string[i + 1])
+            sublists.append(items[start : i + 1])
+        # if flag start has not been set
+        elif take_all:
+            sublists.append(items[i])
             
-    return number_blocks
+    return sublists
 
 
 """
@@ -1362,30 +1417,27 @@ Three summers ago - page 42
 
 def three_summers(items, goal):
     
-    for i in range(len(items)):
-        new_items = get_list_without_element_at_index(items, i)
-        if two_summers(new_items, goal - items[i]):
+    for i in range(len(items) - 2):
+        # finding from i + 1 since we have not found a summers pair before that
+        if two_summers(items[i+1:], goal - items[i]):
             return True
         
     return False
 
 
-def two_summers(items, goal, i = 0, j = None):
-    
-    if j == None:
-        j = len(items) - 1    
-        
-    if i < j:
-        
-        if items[i] + items[j] > goal:
-            return two_summers(items, goal, i, j - 1)
-        
-        if items[i] + items[j] < goal:
-            return two_summers(items, goal, i + 1, j)
-        
-        if items[i] + items[j] == goal:
-            return (i, j)
-        
+def two_summers(items, goal):
+    # the set contains the left over = goal - each item
+    s = set()
+    for i in range(len(items)):
+        # if we found a pair
+        if items[i] in s:
+            # we return the pair
+            return items[i], goal - items[i]        
+        # add the left over from subtracting the current
+        # item to the set to check later if we don't
+        # already have a pair that add up to goal
+        # we add goal - items[i] to the set
+        s.add(goal - items[i])
     return None
 
 
@@ -1720,7 +1772,7 @@ def duplicate_digit_bonus(number):
     if number // 10 == 0:
         return 0
     
-    duplicate_numbers = get_duplicate_numbers(number)
+    duplicate_numbers = get_consectutive_items_with_condition(str(number), is_equal)
     score = 0
     
     for dup_num in duplicate_numbers:
@@ -2274,7 +2326,7 @@ What do you hear, what do you say? - page 61
 
 
 def count_and_say(digits):
-    return ''.join([str(len(distinct_digit_block)) + distinct_digit_block[0] for distinct_digit_block in get_distinct_numbers(digits)])
+    return ''.join([str(len(distinct_digit_block)) + distinct_digit_block[0] for distinct_digit_block in get_consectutive_items_with_condition(digits, is_equal, True)])
 
 
 """
@@ -2606,11 +2658,7 @@ def to_point_2D(origin_point, target_point):
 
 
 def is_diagonal_direction(vector):
-    print('\tx', vector[0])
-    print('\ty', vector[1])
-    r = abs(vector[0]) == abs(vector[1]) != 0
-    print('is diagonal', r)
-    return r
+    return abs(vector[0]) == abs(vector[1]) != 0
 
 def is_same_direction(vector1, vector2):
     cross_product = numpy.cross(vector1, vector2)
@@ -2691,24 +2739,227 @@ Don’t worry, we will fix it in the post - page 72
 
 
 def postfix_evaluate(items):
-    # print(eval(items))
-    ops = []
-    nums = []
-
+    
+    # imported from operator (add, sub, mul, floordiv)
+    ops = { '+' : add, '-' : sub, '*' : mul, '/' : floordiv }
+    
+    equation_stack = collections.deque()
     for item in items:
-        if type(item) == str:
-            ops.append(item)
+        if type(item) == int:
+            equation_stack.append(item)
         else:
-            nums.append(item)
+            n2 = equation_stack.pop()
+            n1 = equation_stack.pop()
+            
+            # if zero div, result is 0 as per description
+            try: result = ops[item](n1, n2)
+            except: result = 0
+            
+            equation_stack.append(result)
 
-    e = ''
-    for i in range(nums):
-        return
+    return equation_stack.pop()
 
+
+"""
+Fractran interpreter - page 73
+"""
+
+# not completed
+def fractran(n, prog, giveup=1000):
     return
 
 
-# postfix_evaluate([2, 3, '+', 4, '*'])
+"""
+Permutation cycles - page 74
+"""
+
+
+def permutation_cycles(perm):
+    cycles = []
+    cycle = []
+    seen = set()
+    
+    # go backward to get same answer as example testcases
+    for i in range(len(perm) - 1, -1, -1):
+        
+        # prevent duplicate
+        if i in seen: continue
+        
+        j = i
+        while True:
+            # if j is not in current cycle
+            if j not in cycle:
+                # add j to current cycle
+                cycle.append(j)
+                # add j to seen set
+                seen.add(j)
+                # move to next j = perm[j]
+                j = perm[j]
+            else:
+                # add current cycle into cycles
+                cycles.append(cycle)
+                # reset cycle
+                cycle = []
+                break
+    
+    # make flat list
+    return flatten_2D_list(cycles[::-1])
+
+
+"""
+Whoever must play, cannot play - page 75
+"""
+
+
+def subtract_square(queries):
+    return
+
+
+"""
+ztalloc ecneuqes - page 76
+"""
+
+
+def collatz(start, shape):
+    
+    validate = {
+        'd': lambda x : x % 2 == 0, # when down, only accept even number
+        'u': lambda x : x % 2 == 1  # when up, only accept odd number
+        }
+    
+    ops = {
+        'd': lambda x : x / 2,
+        'u': lambda x : x * 3 + 1
+        }
+    
+    for op in shape:
+        if not validate[op](start):
+            return None
+        start = ops[op](start)
+    
+    return int(start)
+
+
+def ztalloc(shape):
+
+    validate = {
+        'd': lambda x : x % 2 == 0, # when down, only accept even number
+        'u': lambda x : x % 2 == 1  # when up, only accept odd number
+        }
+    
+    ops = {
+        'd': lambda x : x * 2,      # the reverse of x / 2
+        'u': lambda x : (x - 1) / 3 # the reverse of x * 3 + 1
+        }
+    
+    end = 1
+    
+    # going backward to find the original number
+    for op in shape[::-1]:
+        end = ops[op](end) # calculate the end to the previous step
+        # check after because we're simulating the collatz sequence going backward
+        if not validate[op](end):
+            return None
+    
+    return int(end)
+
+
+"""
+The solution solution - page 77
+"""
+
+
+def balanced_centrifuge(n, k):
+    
+    if k == 0: return True
+    
+    if n - k < 2:
+        return False
+    
+    return False
+
+
+# print(prime_factorize(222))
+# print(prime_factorize(222-107))
+
+
+def get_prime_divisors(n):
+    
+    if n < 2:
+        return None
+    
+    d = []
+    for i in range(2, n + 1):
+        if not is_prime(i):
+            continue
+        if n % i == 0:
+            d.append(i)
+            
+    return d
+
+
+# print(get_prime_divisors(222))
+# print(get_prime_divisors(222-107))
+# print(get_prime_divisors(107))
+
+
+# print(balanced_centrifuge(15, 8))
+
+
+"""
+Reverse ascending sublists - page 78
+"""
+
+
+def reverse_ascending_sublists(items):        
+    return flatten_2D_list([item[::-1] for item in get_consectutive_items_with_condition(items, is_smaller, True)])
+
+
+"""
+Brangelin-o-matic for the people
+"""
+
+
+def brangelina(first, second):
+    first_vowels_map = get_vowels_map(first)
+    second_vowels_map = get_vowels_map(second)
+    first_part, second_part = '', ''
+    
+    cut_off_index = -1
+    if len(first_vowels_map) == 1:
+        cut_off_index = first_vowels_map[0]['index'] 
+    else:
+        cut_off_index = first_vowels_map[ len(first_vowels_map) - 2 ]['index']
+        
+    first_part = first[ : cut_off_index]
+    second_part = second[ second_vowels_map[0]['index'] : ]
+    
+    return first_part + second_part
+
+
+def get_vowels_map(items):
+    
+    start = -1
+    vowels_map = []
+    
+    for i in range(len(items)):
+        
+        if items[i] in 'aeiou':
+            if start == -1:
+                start = i
+                
+        elif start != -1:
+            vowels_map.append( { 'vowel': items[start : i], 'index': start } )
+            start = -1
+        
+    else:
+        if start != -1:
+            vowels_map.append( { 'vowel': items[start : i + 1], 'index': start } )
+            
+    return vowels_map
+
+
+# print(brangelina('britain', 'exit'))
 
 
 """
@@ -2736,20 +2987,39 @@ def fibonacci_sum(n):
 # return the fibonacci sequence not exceed the threshold
 def fibonacci_sequence(threshold):
     
-    n_0, n_1 = 0, 1
-    fib_seq = [n_0, n_1]
+    a, b = 0, 1
+    fib_seq = [a, b]
     
-    while n_1 <= threshold:
-        n_0, n_1 = n_1, n_0 + n_1
-        fib_seq.append(n_0)
+    while b <= threshold:
+        a, b = b, a + b
+        fib_seq.append(a)
         
     return fib_seq
 
-    # n_0, n_1 = 0, 1
-    # yield n_0
-    # yield n_1
+
+"""
+Sum of distinct cubes - page 108
+"""
+
+
+# https://stackoverflow.com/questions/72809141/sum-of-cubes-in-python
+def sum_of_distinct_cubes(n):
+    n_a_cubes = [ ( n, int( n**( 1 / 3 ) ), [] ) ]
+    while n_a_cubes:
+        n, a, cubes = n_a_cubes.pop()
+        # print(f'n = {n}, a = {a}, cubes = {cubes}')
+        if n == 0:
+            return cubes
+        
+        if a > 0:
+            n_a_cubes.append( ( n, a - 1, cubes ) )
+            left_over = n - a**3
+            if left_over >= 0:
+                n_a_cubes.append( ( left_over, a - 1, cubes + [a] ) )
+        # else:
+        #     print('starting to backtrack the n_a_cubes stack...')
     
-    # while n_1 <= threshold:
-    #     n_0, n_1 = n_1, n_0 + n_1
-    #     yield n_0
+    # if not stk:
+    #     print('ran out of items to check for potential cubes... number cannot be represented as sum of distinct cubes...')
+
 
