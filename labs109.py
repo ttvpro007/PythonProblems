@@ -10,7 +10,27 @@ class Node:
         self._right_node = None
         
     def __repr__(self):
-        return self._data
+        return self.__str__()
+    def __str__(self):
+        left_str, right_str = self.__left_right_str()
+        return f'Node({left_str}, {str(self._data)}, {right_str})'
+        
+    def __key(self):
+        return (self._data)
+    def __hash__(self):
+        return hash(self.__key())
+    def __lt__(self, other):
+        return self._data < other.data
+    def __le__(self, other):
+        return self._data <= other.data
+    def __gt__(self, other):
+        return self._data > other.data
+    def __ge__(self, other):
+        return self._data >= other.data
+    def __eq__(self, other):
+        if not other:
+            return self._data == None
+        return self._data == other.data
         
     @property       # getter
     def data(self):
@@ -29,19 +49,24 @@ class Node:
     @property
     def right_node(self):
         return self._right_node
-    @right_node.setter    
+    @right_node.setter
     def right_node(self, right_node):
         self._right_node = right_node
+        
+    def __left_right_str(self):
+        left_str = str(self._left_node.data) if self._left_node else None
+        right_str = str(self._right_node.data) if self._right_node else None
+        return left_str, right_str
         
         
 class DoublyLinkedList:
     def __init__(self, head : Node = None):
         self._head : Node = head
-        self._tail : Node = head
+        self._tail : Node = self._head
         self._items = []
         
         if head:
-            self._link_nodes(self._head, self._tail)
+            # self._link_nodes(self._head, self._tail)
             self._items += [self._head]
     
     # implement this to make class iterable
@@ -109,6 +134,14 @@ class DoublyLinkedList:
     # remove a node from list
     def remove(self, node_to_remove):
         if node_to_remove:
+            
+            # if removing head
+            if node_to_remove == self._head:
+                self._head = self._head.right_node
+            
+            # if removing tail
+            if node_to_remove == self._tail:
+                self._tail = self._tail.left_node
         
             left_node = node_to_remove.left_node
             
@@ -125,6 +158,10 @@ class DoublyLinkedList:
             # to be the left node of current node
             if right_node:
                 right_node.left_node = left_node
+            
+            # cut connection with neighbor nodes
+            node_to_remove.left_node = None
+            node_to_remove.right_node = None
             
             # delete the current node
             del node_to_remove
@@ -187,17 +224,25 @@ def get_element_frequency_dict(items):
     return d
 
 
-def remove_element_with_value(input_list, element_to_remove):
+def remove_elements_with_value(input_list, element_to_remove):
     
-    element_to_remove_indices_indices = []
+    element_to_remove_indices = []
     
     for index in range(len(input_list)):
         
         if input_list[index] == element_to_remove:
-            element_to_remove_indices_indices.append(index - len(element_to_remove_indices_indices))
+            element_to_remove_indices.append(index - len(element_to_remove_indices))
     
-    for index in element_to_remove_indices_indices:
+    for index in element_to_remove_indices:
         del input_list[index]
+        
+    return input_list
+
+
+def remove_elements_with_indices(input_list, element_to_remove_indices):
+    
+    for i in range(len(element_to_remove_indices)):
+        del input_list[ ( element_to_remove_indices[i] - i ) ]
         
     return input_list
 
@@ -313,6 +358,31 @@ def get_sublists_with_condition(items, condition, take_all = False):
             sublists.append(items[i])
             
     return sublists
+
+
+def to_vector_2D(origin_point, target_point):
+    return (target_point[0] - origin_point[0], target_point[1] - origin_point[1])
+
+
+def to_point_2D(origin_point, target_point):
+    return (target_point[0] - origin_point[0], target_point[1] - origin_point[1])
+
+
+def is_diagonal_direction(vector):
+    return abs(vector[0]) == abs(vector[1]) != 0
+
+
+def is_same_direction(vector1, vector2):
+    cross_product = numpy.cross(vector1, vector2)
+    # print(f'cross_product of vector1 {vector1} and vector2 {vector2} is {cross_product}')
+    return cross_product == 0
+
+
+def file_to_list(file_name):
+    file = open(file_name, 'r')
+    lines = file.readlines()
+    file.close()
+    return [line.rstrip() for line in lines]
 
 
 """
@@ -680,8 +750,8 @@ Chirality - page 25
 """
 
 # not completed
-def is_left_handed(pips):
-    return
+# def is_left_handed(pips):
+#     return
 
 
 """
@@ -721,8 +791,8 @@ Do you reach many, do you reach one? - page 27
 """
 
 # not completed
-def knight_jump(knight, start, end):
-    return
+# def knight_jump(knight, start, end):
+#     return
 
 
 """
@@ -984,16 +1054,16 @@ Scylla or Charybdis? - page 35
 """
 
 # not completed
-def scylla_or_charybdis(moves, n):
-    return
+# def scylla_or_charybdis(moves, n):
+#     return
 
 
-def get_step_direction_sum(seq, step = 1):
-    return sum([1 if seq[i] == '+' else -1 for i in range(0, len(seq), step)])
+# def get_step_direction_sum(seq, step = 1):
+#     return sum([1 if seq[i] == '+' else -1 for i in range(0, len(seq), step)])
 
 
-def get_safe_squares(n):
-    return 2 * (n - 1) + 1
+# def get_safe_squares(n):
+#     return 2 * (n - 1) + 1
 
 # arguments = [
 #     { 
@@ -1063,71 +1133,71 @@ Longest arithmetic progression - page 36
 """
 
 # not completed
-def arithmetic_progression(items, stride = None):
-    # start = items[0]
-    # stride = 0
-    # n = 1
+# def arithmetic_progression(items, stride = None):
+#     # start = items[0]
+#     # stride = 0
+#     # n = 1
     
-    # if len(items) <= 1:
-    #     return (start, stride, n)
+#     # if len(items) <= 1:
+#     #     return (start, stride, n)
     
-    # whole = [a for a in range(0, items[len(items) - 1])]
-    # print(whole)
-    # for i in range(len(items) - 1):
-    #     stride = items[i + 1] - items[i]
-    #     for j in range(i, len(items) - 1):
-    #         if items[j] + stride == items[j + 1]:
-    #             n += 1
-    #         else:
-    #             n = 1
-    #             break
-    # return (start, stride, n)
+#     # whole = [a for a in range(0, items[len(items) - 1])]
+#     # print(whole)
+#     # for i in range(len(items) - 1):
+#     #     stride = items[i + 1] - items[i]
+#     #     for j in range(i, len(items) - 1):
+#     #         if items[j] + stride == items[j + 1]:
+#     #             n += 1
+#     #         else:
+#     #             n = 1
+#     #             break
+#     # return (start, stride, n)
     
     
-    if len(items) <= 1:
-        return (items[0], 0, 1)
+#     if len(items) <= 1:
+#         return (items[0], 0, 1)
     
-    start = 0
-    if stride == None:
-        stride = 0
-    prog_seq = []
-    # n = 0
-    index_stride_dict = {}
+#     start = 0
+#     if stride == None:
+#         stride = 0
+#     prog_seq = []
+#     # n = 0
+#     index_stride_dict = {}
     
-    for i in range(len(items) - 1):
-        index_stride_dict[items[i]] = items[i + 1] - items[i]
+#     for i in range(len(items) - 1):
+#         index_stride_dict[items[i]] = items[i + 1] - items[i]
     
-    i = 0
-    j = 1
-    while i < len(items) - j:
-        # start and stride don't change when
-        # process 1 success
-        index_to_check = i + j
-        start = items[i]
-        stride = items[index_to_check] - start
-        prog_seq.append(start)
-        prog_seq.append(items[index_to_check])
+#     i = 0
+#     j = 1
+#     while i < len(items) - j:
+#         # start and stride don't change when
+#         # process 1 success
+#         index_to_check = i + j
+#         start = items[i]
+#         stride = items[index_to_check] - start
+#         prog_seq.append(start)
+#         prog_seq.append(items[index_to_check])
         
-        # process 1
-        while j < len(items) - i:
-            k = j + 1
-            index_to_check = k + 1
-            while k < len(items) - index_to_check:
-                # print(f'i {i} - j {j} - k {k}')
-                # print(f'index_to_check = {index_to_check}')
-                if items[index_to_check] + stride == items[index_to_check + k]:
-                    prog_seq.append(items[index_to_check])
-                    index_to_check = k
-                    break
-                k += 1
-            j += 1
-            if j == len(items) - i:
-                j = 0
-                break
-        i += 1
+#         # process 1
+#         while j < len(items) - i:
+#             k = j + 1
+#             index_to_check = k + 1
+#             while k < len(items) - index_to_check:
+#                 # print(f'i {i} - j {j} - k {k}')
+#                 # print(f'index_to_check = {index_to_check}')
+#                 if items[index_to_check] + stride == items[index_to_check + k]:
+#                     prog_seq.append(items[index_to_check])
+#                     index_to_check = k
+#                     break
+#                 k += 1
+#             j += 1
+#             if j == len(items) - i:
+#                 j = 0
+#                 break
+#         i += 1
                 
-    # return (start, stride, n)
-    return prog_seq
+#     # return (start, stride, n)
+#     return prog_seq
                 
 # print(arithmetic_progression([2, 4, 5, 6, 8, 12, 17]))
     
@@ -1192,13 +1262,13 @@ Best one out of three - page 37
 """
 
 # not completed
-def tukeys_ninthers(items):
-    res = []
-    for i in range(0, len(items), 3):
-        res.append(sum(items[i:i+4]) // 3)
-    if len(res) > 1:
-        return tukeys_ninthers(res)
-    return res
+# def tukeys_ninthers(items):
+#     res = []
+#     for i in range(0, len(items), 3):
+#         res.append(sum(items[i:i+4]) // 3)
+#     if len(res) > 1:
+#         return tukeys_ninthers(res)
+#     return res
 
 
 """
@@ -1517,8 +1587,8 @@ As below, so above - page 45
 """
 
 # not completed
-def leibniz(heads, positions):
-    return
+# def leibniz(heads, positions):
+#     return
 
 
 """
@@ -1996,7 +2066,7 @@ def remove_after_kth(items, k=1):
             seen[items[i]] -= 1
             items[i] = None
             
-    return remove_element_with_value(items, None)
+    return remove_elements_with_value(items, None)
 
 
 """
@@ -2044,44 +2114,44 @@ Cornered cases - page 56
 """
 
 # not completed
-def count_corners(points):
+# def count_corners(points):
     
-    # condition to be corner:
-    # p1 (x, y + h)
-    #     |\
-    #     |  \
-    #     |    \
-    #     |      \
-    #     |        \
-    #     |__________\
-    # p0 (x, y)     p2 (x + h, y)
+#     # condition to be corner:
+#     # p1 (x, y + h)
+#     #     |\
+#     #     |  \
+#     #     |    \
+#     #     |      \
+#     #     |        \
+#     #     |__________\
+#     # p0 (x, y)     p2 (x + h, y)
     
-    count = 0
+#     count = 0
     
-    tris = []
+#     tris = []
     
-    same_x = {}
-    same_y = {}
+#     same_x = {}
+#     same_y = {}
     
-    for point in points:
-        if point[0] not in same_x:
-            same_x[point[0]] = [point[1]]
-        else:
-            same_x[point[0]].append(point[1])
+#     for point in points:
+#         if point[0] not in same_x:
+#             same_x[point[0]] = [point[1]]
+#         else:
+#             same_x[point[0]].append(point[1])
             
-        if point[1] not in same_y:
-            same_y[point[1]] = [point[0]]
-        else:
-            same_y[point[1]].append(point[0])
+#         if point[1] not in same_y:
+#             same_y[point[1]] = [point[0]]
+#         else:
+#             same_y[point[1]].append(point[0])
             
-    print('same x', same_x)
-    print('same y', same_y)
+#     print('same x', same_x)
+#     print('same y', same_y)
     
-    for x in same_x:
-        for y in same_x[x]:
-            print(f'{x}, {y}')
+#     for x in same_x:
+#         for y in same_x[x]:
+#             print(f'{x}, {y}')
             
-    return tris
+#     return tris
 
 
 # print(count_corners([(1, 3), (1, 4), (1, 5), (1, 6), (2, 3), (3, 3), (4, 3)]))
@@ -2095,12 +2165,13 @@ Count consecutive summers - page 57
 # by definition, the count of consecutive number that adds up to the number n
 # is the count of the odd divisors + 1
 def count_consecutive_summers(n):
-    count = 1
-    for i in range(2, n + 1):
-        # if is odd divisor
-        if i % 2 == 1 and n % i == 0:
-            count += 1
-    return count
+    # count = 1
+    # for i in range(2, n + 1):
+    #     # if is odd divisor
+    #     if i % 2 == 1 and n % i == 0:
+    #         count += 1
+    # return count
+    return sum(1 for i in range(2, n + 1) if i % 2 == 1 and n % i == 0) + 1
 
 
 """
@@ -2164,160 +2235,86 @@ def first_preceded_by_smaller(items, k = 1):
 Crab bucket list - page 60
 """
 
-# line 2587 in tester109
-def eliminate_neighbours(items):
-    
-    # handles length 1
-    if len(items) < 2:
-        return 1
-    
-    index_nodes = []
-    element_dict = {}
-    current_smallest_item = 1
-    largest_item = max(items)
-    largest_seen = 1
-    count = 0
-    
-    # populate index nodes and 
-    for i in range(len(items)):
-        left_index = i - 1 if i - 1 >= 0 else None
-        left_node = index_nodes[ left_index ] if left_index != None else None
-        curr_node = Node( items[i] )
-        curr_node.left_node = left_node
-        
-        if left_node != None:
-            left_node.right_node = curr_node
-            
-        index_nodes.append( curr_node )
-        
-        element_dict[ items[ i ] ] = {'index': i, 'seen': False}
-        
-    while largest_seen != largest_item:
-        
-        # remove biggest neighbor node
-        current_smallest_item_node = index_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
-        
-        left_node = current_smallest_item_node. left_node
-        
-        right_node = current_smallest_item_node. right_node
-        
-        biggest_neighbor_node = None
-        
-        if not left_node:
-            biggest_neighbor_node = right_node
-            
-        elif not right_node:
-            biggest_neighbor_node = left_node
-            
+
+class Crab:
+    def __init__(self, value, left = None, right = None):
+        self.value = value
+        self.left = left
+        self.right = right
+    def __lt__(self, other):
+        return self.value < other.value
+    def __le__(self, other):
+        return self.value <= other.value
+    def __gt__(self, other):
+        return self.value > other.value
+    def __ge__(self, other):
+        return self.value >= other.value
+    def __eq__(self, other):
+        if not other:
+            return self.value == None
+        return self.value == other.value
+
+# A special doubly linked list
+class CrabList:
+    def __init__(self, head = None):
+        self._head = head
+        self._tail = self._head
+    def __iter__(self):
+        return self.move_right()
+    def _link_crabs(self, left_crab, right_crab):
+        if left_crab: left_crab.right = right_crab
+        if right_crab: right_crab.left = left_crab
+    def add(self, data):
+        crab = Crab(data)
+        if self._head == None:
+            self.__init__(crab)
         else:
-            biggest_neighbor_node = left_node if left_node. data > right_node. data else right_node
-            # biggest_neighbor_node = left_node if left_node > right_node else right_node
-        
-        if biggest_neighbor_node:
-            largest_seen = biggest_neighbor_node. data
-            element_dict[ largest_seen ][ 'seen' ] = True
-            remove_node( biggest_neighbor_node )
-        
-        # remove current smallest item
-        element_dict[ current_smallest_item ][ 'seen' ] = True
-        remove_node( current_smallest_item_node )
-        
+            self._link_crabs(self._tail, crab)
+            self._tail = self._tail.right
+        return crab
+    def move_right(self):
+        current_crab = self._head
+        while current_crab:
+            yield current_crab
+            current_crab = current_crab.right
+    def crabs_to_remove(self, base_crab):
+        if base_crab.left and base_crab.right:
+            return base_crab, base_crab.left if base_crab.left > base_crab.right else base_crab.right
+        else:
+            return base_crab, base_crab.left if base_crab.left else base_crab.right
+    def remove_crab(self, crab_to_remove):
+        if not crab_to_remove: pass
+        if crab_to_remove == self._head:
+            self._head = self._head.right
+        if crab_to_remove == self._tail:
+            self._tail = self._tail.left
+        left_crab = crab_to_remove.left
+        right_crab = crab_to_remove.right
+        if left_crab: left_crab.right = right_crab
+        if right_crab: right_crab.left = left_crab
+        crab_to_remove.left = None
+        crab_to_remove.right = None
+        return crab_to_remove
+
+def eliminate_neighbours(items):
+    crab_list = CrabList()
+    item_value_to_crab_dict = {}
+    removed_values = set()
+    for i in range(len(items)):
+        item_value_to_crab_dict[ items[i] ] = crab_list.add( items[i] )
+    largest_crab = max(crab_list)
+    current_smallest_item_value = 1
+    count = 1
+    while True:
+        smallest_crab = item_value_to_crab_dict[ current_smallest_item_value ]
+        if smallest_crab == largest_crab: break
+        crab1, crab2 = crab_list.crabs_to_remove(smallest_crab)
+        if crab1 == largest_crab or crab2 == largest_crab: break
+        removed_values.add( crab_list.remove_crab( crab1 ).value )
+        removed_values.add( crab_list.remove_crab( crab2 ).value )
+        while current_smallest_item_value in removed_values: current_smallest_item_value += 1
         count += 1
-        
-        if current_smallest_item == largest_item:
-            break
-        
-        while current_smallest_item < largest_item and element_dict[ current_smallest_item ][ 'seen' ] == True:
-            current_smallest_item += 1
-        
     return count
-
-
-def remove_node(curr_node):
-    if curr_node:
-    
-        left_node = curr_node.left_node
-        
-        right_node = curr_node.right_node
-        
-        # if there is a left node
-        # set the right node of that left node
-        # to be the right node of current node
-        if left_node:
-            left_node.right_node = right_node
-        
-        # if there is a right node
-        # set the left node of that right node
-        # to be the left node of current node
-        if right_node:
-            right_node.left_node = left_node
-        
-        # now we remove the connection of the
-        # current node to its left and right nodes
-        curr_node.left_node = None
-        curr_node.right_node = None
-
-
-# line 2588 in tester109
-# def eliminate_neighbours(items):
-    
-#     # handles length 1
-#     if len(items) < 2:
-#         return 1
-    
-#     item_value_nodes = DoublyLinkedList()
-#     # index_nodes = []
-#     element_dict = {}
-#     current_smallest_item = 1
-#     largest_item = max(items)
-#     largest_seen = 1
-#     count = 0
-    
-#     # populate index nodes and position dictionary
-#     for i in range(len(items)):
-#         item_value_nodes.add(Node(items[i]))
-#         element_dict[ items[ i ] ] = {'index': i, 'seen': False}
-        
-#     while largest_seen < largest_item:
-        
-#         # remove biggest neighbor node
-#         current_smallest_item_node = item_value_nodes[ element_dict[ current_smallest_item ][ 'index' ] ]
-        
-#         left_node = current_smallest_item_node. left_node
-#         right_node = current_smallest_item_node. right_node
-        
-#         biggest_neighbor_node = None
-        
-#         if not left_node:
-#             biggest_neighbor_node = right_node
-            
-#         elif not right_node:
-#             biggest_neighbor_node = left_node
-            
-#         elif left_node and right_node:
-#             biggest_neighbor_node = left_node if left_node. data > right_node. data else right_node
-        
-#         if biggest_neighbor_node:
-#             largest_seen = biggest_neighbor_node. data
-#             # record the largest_seen as seen = True
-#             element_dict[ largest_seen ][ 'seen' ] = True
-#             item_value_nodes.remove( biggest_neighbor_node )
-        
-#         # record the current_smallest_item as seen = True
-#         element_dict[ current_smallest_item ][ 'seen' ] = True
-#         # remove current smallest item
-#         item_value_nodes.remove( current_smallest_item_node )
-        
-#         count += 1
-        
-#         if current_smallest_item == largest_item:
-#             break
-        
-#         # increment the smallest item until its value has not been seen in the record
-#         while current_smallest_item < largest_item and element_dict[ current_smallest_item ][ 'seen' ] == True:
-#             current_smallest_item += 1
-        
-#     return count
 
 
 """
@@ -2334,8 +2331,8 @@ Bishops on a binge - page 62
 """
 
 # not completed
-def safe_squares_bishops(n, bishops):
-    return
+# def safe_squares_bishops(n, bishops):
+#     return
 
 
 """
@@ -2343,33 +2340,33 @@ Dem’s some mighty tall words, pardner - page 63
 """
 
 # not completed
-def word_height(words, word):
+# def word_height(words, word):
 
-    for i in range(1, len(word)):
+#     for i in range(1, len(word)):
         
-        left_word = word[:i]
-        left_word_index = bisect.bisect_left(words, left_word)
-        right_word = word[i:]
-        right_word_index = bisect.bisect_left(words, right_word)
+#         left_word = word[:i]
+#         left_word_index = bisect.bisect_left(words, left_word)
+#         right_word = word[i:]
+#         right_word_index = bisect.bisect_left(words, right_word)
         
-        if left_word == words[left_word_index] and right_word == words[right_word_index]:
+#         if left_word == words[left_word_index] and right_word == words[right_word_index]:
             
-            left_height = word_height(words, left_word)
-            right_height = word_height(words, right_word)
+#             left_height = word_height(words, left_word)
+#             right_height = word_height(words, right_word)
             
-            height = max(left_height, right_height) + 1
+#             height = max(left_height, right_height) + 1
             
-            return height
+#             return height
     
-    word_index = bisect.bisect_left(words, word)
-    if word == words[word_index]:
-        height = 1
-        return height
-    else:
-        height = 0
-        return height
+#     word_index = bisect.bisect_left(words, word)
+#     if word == words[word_index]:
+#         height = 1
+#         return height
+#     else:
+#         height = 0
+#         return height
     
-    return None
+#     return None
 
 
 """
@@ -2377,64 +2374,64 @@ Up for the count - page 64
 """
 
 # not completed
-get_number_of_digit = lambda lower_bound, upper_bound, power : (upper_bound - lower_bound) * power
+# get_number_of_digit = lambda lower_bound, upper_bound, power : (upper_bound - lower_bound) * power
 
 
-def counting_series(n):
-    #                                                                                       This is where index n is in
-    #                                                                                                   |
-    #     lower            upper                                                    power               |
-    #       |                |                                                        |                 |
-    #       v                v                                                        v                 v
-    # range(         1   -            10)             -> 9 numbers            -> 9   * 1     digits =           9 digits
-    # range(        10   -           100)            -> 90 numbers           -> 90   * 2     digits =         180 digits
-    # range(       100   -          1000)           -> 900 numbers          -> 900   * 3     digits =        2700 digits
-    # range(      1000   -         10000)          -> 9000 numbers         -> 9000   * 4     digits =       36000 digits
-    # range(     10000   -        100000)         -> 90000 numbers        -> 90000   * 5     digits =      450000 digits
-    # range(    100000   -       1000000)        -> 900000 numbers       -> 900000   * 6     digits =     5400000 digits
-    # range(   1000000   -      10000000)       -> 9000000 numbers      -> 9000000   * 7     digits =    63000000 digits
-    # range(  10000000   -     100000000)      -> 90000000 numbers     -> 90000000   * 8     digits =   720000000 digits
-    # range( 100000000   -    1000000000)     -> 900000000 numbers    -> 900000000   * 9     digits =  8100000000 digits
-    # range(1000000000   -   10000000000)    -> 9000000000 numbers   -> 9000000000   * 10    digits = 90000000000 digits
+# def counting_series(n):
+#     #                                                                                       This is where index n is in
+#     #                                                                                                   |
+#     #     lower            upper                                                    power               |
+#     #       |                |                                                        |                 |
+#     #       v                v                                                        v                 v
+#     # range(         1   -            10)             -> 9 numbers            -> 9   * 1     digits =           9 digits
+#     # range(        10   -           100)            -> 90 numbers           -> 90   * 2     digits =         180 digits
+#     # range(       100   -          1000)           -> 900 numbers          -> 900   * 3     digits =        2700 digits
+#     # range(      1000   -         10000)          -> 9000 numbers         -> 9000   * 4     digits =       36000 digits
+#     # range(     10000   -        100000)         -> 90000 numbers        -> 90000   * 5     digits =      450000 digits
+#     # range(    100000   -       1000000)        -> 900000 numbers       -> 900000   * 6     digits =     5400000 digits
+#     # range(   1000000   -      10000000)       -> 9000000 numbers      -> 9000000   * 7     digits =    63000000 digits
+#     # range(  10000000   -     100000000)      -> 90000000 numbers     -> 90000000   * 8     digits =   720000000 digits
+#     # range( 100000000   -    1000000000)     -> 900000000 numbers    -> 900000000   * 9     digits =  8100000000 digits
+#     # range(1000000000   -   10000000000)    -> 9000000000 numbers   -> 9000000000   * 10    digits = 90000000000 digits
     
-    total_digits = 0
-    power = 0
-    lower_bound, upper_bound = 0, 0
-    num_of_digit_lower, num_of_digit_upper = 0, 0
+#     total_digits = 0
+#     power = 0
+#     lower_bound, upper_bound = 0, 0
+#     num_of_digit_lower, num_of_digit_upper = 0, 0
     
-    while num_of_digit_upper < n:
-        power += 1
-        lower_bound = 10 ** power
-        upper_bound = 10 ** (power + 1)
-        num_of_digit_lower = get_number_of_digit(lower_bound // 10, upper_bound // 10, power)
-        num_of_digit_upper = get_number_of_digit(lower_bound, upper_bound, power + 1)
+#     while num_of_digit_upper < n:
+#         power += 1
+#         lower_bound = 10 ** power
+#         upper_bound = 10 ** (power + 1)
+#         num_of_digit_lower = get_number_of_digit(lower_bound // 10, upper_bound // 10, power)
+#         num_of_digit_upper = get_number_of_digit(lower_bound, upper_bound, power + 1)
         
-        total_digits += num_of_digit_lower
+#         total_digits += num_of_digit_lower
     
-    num_count = (n - total_digits) // power
+#     num_count = (n - total_digits) // power
     
-    # number of digits = (upper - lower) * power
-    # e = (10 ^ (p + 1) - 10 ^ p) * p
+#     # number of digits = (upper - lower) * power
+#     # e = (10 ^ (p + 1) - 10 ^ p) * p
     
-    # print(f'index {n} belongs to number in range {lower_bound} - {upper_bound}')
-    # print(f'{num_of_digit_lower} - {num_of_digit_upper}')
-    # print(f'num_count with power {power}: {num_count}')
-    # print(f'total_digits below n {total_digits + num_count * power}')   
+#     # print(f'index {n} belongs to number in range {lower_bound} - {upper_bound}')
+#     # print(f'{num_of_digit_lower} - {num_of_digit_upper}')
+#     # print(f'num_count with power {power}: {num_count}')
+#     # print(f'total_digits below n {total_digits + num_count * power}')   
 
-    s = '123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100'
+#     s = '123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100'
     
-    digit_count = 1
-    power = 1
-    i = 1
-    while i < len(s) + 1:
-        if i == 10 ** power:
-            digit_count += 1
+#     digit_count = 1
+#     power = 1
+#     i = 1
+#     while i < len(s) + 1:
+#         if i == 10 ** power:
+#             digit_count += 1
             
-        # print(f'i = {i}\tnum = {s[i - 1 : i + digit_count - 1]}')
+#         # print(f'i = {i}\tnum = {s[i - 1 : i + digit_count - 1]}')
         
-        i += digit_count
+#         i += digit_count
     
-    return
+#     return
 
 
 # counting_series(10)
@@ -2487,8 +2484,8 @@ Everybody on the floor, come do the Scrooge Shuffle - page 66
 """
 
 # not completed
-def spread_the_coins(coins, left, right):
-    return
+# def spread_the_coins(coins, left, right):
+#     return
 
 
 """
@@ -2526,8 +2523,8 @@ Verbos regulares - page 68
 """
 
 # not completed
-def conjugate_regular(verb, subject, tense):
-    return
+# def conjugate_regular(verb, subject, tense):
+#     return
 
 
 """
@@ -2552,14 +2549,14 @@ def frog_collision_time(frog1, frog2):
     t = 0
     
     try:
-        t = (pos1[0] - pos2[0]) // (dir2[0] - dir1[0])
+        t = (pos1[0] - pos2[0]) / (dir2[0] - dir1[0])
     except: pass
 
     try:
-        t = (pos1[1] - pos2[1]) // (dir2[1] - dir1[1])
+        t = (pos1[1] - pos2[1]) / (dir2[1] - dir1[1])
     except: pass
 
-    return t if t > 0 else None
+    return int(t) if t > 0 and t % 1 == 0 else None
 
 
 def can_meet(frog1, frog2):
@@ -2576,7 +2573,8 @@ Where no one can hear you bounce - page 70
 # not completed
 def reach_corner(x, y, n, m, aliens, debug = False):
 
-    corners = [(0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1)]
+    corners = [ (0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1) ]
+    initial_directions = [ (-1, -1), (-1, 1), (1, -1), (1, 1) ]
     
     if debug:
         print(f'\ncorners are {corners}')
@@ -2648,22 +2646,110 @@ def reach_corner(x, y, n, m, aliens, debug = False):
     return False
 
 
-# helpers
-def to_vector_2D(origin_point, target_point):
-    return (target_point[0] - origin_point[0], target_point[1] - origin_point[1])
+class Boundary2D:
+    def __init__(self, dimension):
+        self.min_x, self.min_y = 0, 0
+        self.max_x, self.max_y = dimension[0] - 1, dimension[1] - 1
+    def is_in_boundary(self, position):
+        is_within_x_bounds = position[0] >= self.min_x and position[0] <= self.max_x
+        is_within_y_bounds = position[1] >= self.min_y and position[1] <= self.max_y
+        return is_within_x_bounds and is_within_y_bounds
+        
+        
+def get_boundary_point(position, direction, boundary):
+    
+    potential_x = position[0] + direction[0] * min(boundary.max_x, boundary.max_y)
+    potential_y = position[1] + direction[1] * min(boundary.max_x, boundary.max_y)
+    
+    if boundary.is_in_boundary( (potential_x, potential_y) ):
+        return (potential_x, potential_y)
+    
+    # get distance from potential position to
+    # boundary left, right, top, and bottom
+    dx_hi = boundary.max_x - potential_x
+    dx_lo = potential_x - boundary.min_x
+    dy_hi = boundary.max_y - potential_y
+    dy_lo = potential_y - boundary.min_y
+    
+    # take the min distance to the boundary for each direction in (-1, -1), (-1, 1), (1, -1), (1, 1)
+    d = min(dx_lo if potential_x < 0 else dx_hi, dy_lo if potential_y < 0 else dy_hi)
+    
+    return ( potential_x + d * direction[0], potential_y + d * direction[1] )
 
 
-def to_point_2D(origin_point, target_point):
-    return (target_point[0] - origin_point[0], target_point[1] - origin_point[1])
+def get_diagonal_bounce_points(origin_point, initial_direction, board_dimension):
+    """
+    Parameters
+    ----------
+    origin_point : TYPE tuple (x, y)
+        DESCRIPTION origin point of the ball.
+    initial_direction : TYPE tuple (x, y)
+        DESCRIPTION initial moving direction diagonally (only works with x and y = 1 or 0)
+    board_dimension : TYPE tuple (x, y)
+        DESCRIPTION the dimension of the square in which the ball can bounce.
+
+    Returns
+    -------
+    List of bounce points type tuple (x, y).
+
+    """
+    print('initial_direction', initial_direction)
+    n = board_dimension[0]
+    m = board_dimension[1]
+    corners = [ (0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1) ]
+    
+    bounce_points = []
+    current_position = origin_point
+    current_direction = [ initial_direction[0], initial_direction[1] ]
+    boundary = Boundary2D(board_dimension)
+    
+    while True:
+        
+        bounce_point = get_boundary_point(current_position, current_direction, boundary)
+        
+        if bounce_point in bounce_points:
+            break
+        
+        # if bounce on x bounds flip x direction
+        if bounce_point[0] == boundary.min_x or bounce_point[0] == boundary.max_x:
+            current_direction[0] *= -1
+        # if bounce on y bounds flip y direction
+        elif bounce_point[1] == boundary.min_y or bounce_point[1] == boundary.max_y:
+            current_direction[1] *= -1
+        else:
+            print('Should not reach here')
+            break
+        
+        bounce_points.append(bounce_point)
+        current_position = bounce_point
+        
+    return bounce_points
 
 
-def is_diagonal_direction(vector):
-    return abs(vector[0]) == abs(vector[1]) != 0
+def print_corners(board_dimension):
+    n = board_dimension[0]
+    m = board_dimension[1]
+    corners = [ (0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1) ]
+    print('corners', corners)
+    
 
-def is_same_direction(vector1, vector2):
-    cross_product = numpy.cross(vector1, vector2)
-    # print(f'cross_product of vector1 {vector1} and vector2 {vector2} is {cross_product}')
-    return cross_product == 0
+# bishop_position = (1, 4)
+# board_dimension = (32, 8)
+initial_directions = [ (-1, -1), (-1, 1), (1, -1), (1, 1) ]
+
+bishop_position = (0, 2)
+board_dimension = (5, 5)
+
+print_corners(board_dimension)
+
+for initial_direction in initial_directions:
+    print( get_diagonal_bounce_points(bishop_position, initial_direction, board_dimension) )
+    print()
+
+    
+    
+
+        
 
 
 # print(reach_corner( 0, 2, 5, 5, [], debug = True ) )
@@ -2686,45 +2772,45 @@ Nearest polygonal number - page 71
 """
 
 # not completed
-def nearest_polygonal_number(n, s):
+# def nearest_polygonal_number(n, s):
     
-    lo, hi = 1, 1
-    polynum = calculate_polynum(s, (lo + hi) // 2)
+#     lo, hi = 1, 1
+#     polynum = calculate_polynum(s, (lo + hi) // 2)
     
-    while polynum < n:
-        hi *= 2
-        print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
-        polynum = calculate_polynum(s, (lo + hi) // 2)
-        print('1', polynum)
+#     while polynum < n:
+#         hi *= 2
+#         print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
+#         polynum = calculate_polynum(s, (lo + hi) // 2)
+#         print('1', polynum)
         
-    hi //= 2
-    polynum = calculate_polynum(s, (lo + hi) // 2)
+#     hi //= 2
+#     polynum = calculate_polynum(s, (lo + hi) // 2)
     
-    while polynum < n:
-        lo *= 2
-        print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
-        polynum = calculate_polynum(s, (lo + hi) // 2)
-        print('2', polynum)
+#     while polynum < n:
+#         lo *= 2
+#         print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
+#         polynum = calculate_polynum(s, (lo + hi) // 2)
+#         print('2', polynum)
         
-    lo //= 2
+#     lo //= 2
     
-    while lo < hi:
-        i = (lo + hi) // 2
-        print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
-        polynum = calculate_polynum(s, i)
-        print('3', polynum)
-        if polynum == n:
-            return polynum
-        if polynum > n:
-            lo += 1
-        else:
-            hi -= 1
+#     while lo < hi:
+#         i = (lo + hi) // 2
+#         print(f'lo, mid, hi = {lo}, {(lo + hi) // 2}, {hi}')
+#         polynum = calculate_polynum(s, i)
+#         print('3', polynum)
+#         if polynum == n:
+#             return polynum
+#         if polynum > n:
+#             lo += 1
+#         else:
+#             hi -= 1
     
-    return polynum
+#     return polynum
 
 
-def calculate_polynum(s, i):
-    return ( (s - 2) * i * i - (s - 4) * i ) // 2
+# def calculate_polynum(s, i):
+#     return ( (s - 2) * i * i - (s - 4) * i ) // 2
 
 # print(nearest_polygonal_number(5, 3))
 # print(nearest_polygonal_number(27, 4))
@@ -2765,8 +2851,8 @@ Fractran interpreter - page 73
 """
 
 # not completed
-def fractran(n, prog, giveup=1000):
-    return
+# def fractran(n, prog, giveup=1000):
+#     return
 
 
 """
@@ -2810,9 +2896,9 @@ def permutation_cycles(perm):
 Whoever must play, cannot play - page 75
 """
 
-
-def subtract_square(queries):
-    return
+# not completed
+# def subtract_square(queries):
+#     return
 
 
 """
@@ -2868,15 +2954,15 @@ def ztalloc(shape):
 The solution solution - page 77
 """
 
-
-def balanced_centrifuge(n, k):
+# not completed
+# def balanced_centrifuge(n, k):
     
-    if k == 0: return True
+#     if k == 0: return True
     
-    if n - k < 2:
-        return False
+#     if n - k < 2:
+#         return False
     
-    return False
+#     return False
 
 
 # print(prime_factorize(222))
@@ -2916,7 +3002,7 @@ def reverse_ascending_sublists(items):
 
 
 """
-Brangelin-o-matic for the people
+Brangelin-o-matic for the people - page 79
 """
 
 
@@ -2959,7 +3045,287 @@ def get_vowels_map(items):
     return vowels_map
 
 
-# print(brangelina('britain', 'exit'))
+"""
+Line with most points - page 80
+"""
+
+# not completed
+# def line_with_most_points(points):
+#     return
+
+
+"""
+Om nom nom - page 81
+"""
+
+# not completed
+# def cookie(piles):
+#     return
+
+
+"""
+Autocorrect for sausage fingers - page 82
+"""
+
+
+def autocorrect_word(word, words, key_dist):
+    candidate = ''
+    min_key_dist = -1
+    for i in range(len(words)):
+        potential_key_dist_sum = key_dist_sum(words[i], word, key_dist)
+        # if potential key dist sum not valid then continue
+        if potential_key_dist_sum < 0:
+            continue
+        # return the word if no error
+        elif potential_key_dist_sum == 0:
+            return word
+        else:
+            # initialize min key dist and candidate
+            if min_key_dist < 0:
+                min_key_dist = potential_key_dist_sum
+                candidate = words[i]
+            # if already initialize, check for min key dist
+            # assign new candidate if get new min key dist
+            elif min_key_dist > potential_key_dist_sum:
+                min_key_dist = min(min_key_dist, potential_key_dist_sum)
+                candidate = words[i]
+    return candidate
+
+
+def key_dist_sum(word, other_word, key_dist):
+    if len(word) != len(other_word):
+        return -1
+    return sum( key_dist( word[i], other_word[i] ) for i in range(len(word) ) )
+
+
+"""
+Uambcsrlne the wrod - page 83
+"""
+
+
+def unscramble(words, word):
+    min_search_index = bisect.bisect_left( words, word[0] + min(word[1:]) * (len(word) - 1) )
+    max_search_index = bisect.bisect_right( words, word[0] + max(word[1:]) * (len(word) - 1) ) # search for the maximun possible word
+    return [words[i] for i in range(min_search_index, max_search_index) if is_equal_unscrambled(words[i], word)]
+
+
+def is_equal_unscrambled(word, other_word):
+    # check for length, start and end chars
+    if len(word) != len(other_word) or word[0] != other_word[0] or word[-1] != other_word[-1]:
+        return False
+    for i in range(len(word)):
+        # check for char count in both word
+        if word.count(word[i]) != other_word.count(word[i]):
+            return False # not equal when unscrambled
+    return True
+
+
+"""
+Substitution words - page 84
+"""
+
+
+def substitution_words(pattern, words):
+    return [word for word in words if is_match_with_pattern(pattern, word)]
+
+
+def is_match_with_pattern(pattern, word):
+    if len(pattern) != len(word):
+        return False
+    seen_char_set = set()
+    pattern_char_dict = {}
+    for i in range(len(pattern)):
+        # if key detected at index i of pattern
+        if pattern[i] in pattern_char_dict:
+            # compare the value of that key to the word char at index i
+            if pattern_char_dict[ pattern[i] ] != word[i]:
+                return False # not a sub word if key and value not match
+        # if key not detected
+        else:
+            # if we have not seen the value
+            if word[i] not in seen_char_set:
+                # add to dictionary
+                pattern_char_dict[ pattern[i] ] = word[i]
+                # add to seen char set
+                seen_char_set.add( word[i] )
+            # if we have seen the char
+            else:
+                return False # not a sub word because value already exist for another key
+    return True
+
+
+"""
+Manhattan skyline - page 85
+"""
+
+# https://codereview.stackexchange.com/questions/221178/python-program-to-solve-the-skyline-problem
+# answer inspired from the website above
+def get_skyline(towers):
+    """
+    :type towers: List[List[int]]
+    :rtype: List[List[int]]
+    """
+    if not towers: return []
+    if len(towers) == 1:
+        return [ ( towers[0][0], towers[0][2] ), ( towers[0][1], 0 ) ]
+
+    mid = len(towers) // 2
+    left = get_skyline( towers[:mid] )
+    right = get_skyline( towers[mid:] )
+    return merge_skylines(left, right)
+
+def merge_skylines(left, right):
+    y1, y2 = 0, 0
+    i, j = 0, 0
+    result = [(0, 0)]
+
+    while i < len(left) and j < len(right):
+        x1, x2 = left[i][0], right[j][0]
+        if x1 <= x2:
+            y1 = left[i][1]
+            i += 1
+        elif x2 <= x1:
+            y2 = right[j][1]
+            j += 1
+        higher_y = max(y1, y2)
+        lower_x = min(x1, x2)
+        if higher_y != result[-1][1]:
+            result.append([lower_x, higher_y])
+            
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result[1:]
+
+# inserting corner coordinate to breakdown mesh into rects
+def get_rect_cooredinates_from_skyline(skyline_points):
+    """
+    rect coordinate: ( [x1, y1], [x2, y2] )
+    """
+    rect_cooredinates = []
+    start_point = None
+    for skyline_point in skyline_points:
+        # if have no start point, get that point then skip the rest
+        if not start_point:
+            start_point = skyline_point
+            continue
+        # if the y coord is 0 then append it raw
+        # start point now is None since we want to skip this point
+        if skyline_point[1] == 0:
+            rect_cooredinates.append( ( start_point, skyline_point ) )
+            start_point = None
+        # else we cook it into one by making the y = 0
+        # start point now should be current point bc we don't want to skip this point
+        else:
+            rect_cooredinates.append( ( start_point, ( skyline_point[0], 0 ) ) )
+            start_point = skyline_point
+    return rect_cooredinates
+
+def get_rect_area_from_coordinate(rect_coordinate):
+    return (rect_coordinate[1][0] - rect_coordinate[0][0]) * (rect_coordinate[0][1] - rect_coordinate[1][1])
+    
+def manhattan_skyline(towers):
+    return sum( get_rect_area_from_coordinate( rect_coordinate ) for rect_coordinate in get_rect_cooredinates_from_skyline( get_skyline( towers ) ) )
+
+
+"""
+Count overlapping disks - page 86
+"""
+
+# not completed
+# def count_overlapping_disks(disks):
+#     return
+
+
+"""
+Ordinary cardinals - page 87
+"""
+
+# not completed
+# def sort_by_digit_count(items):
+#     count_sort_filter = 9
+#     result = []
+    
+#     while len(items) > 0:
+#         to_sort, to_pop_indices = [], []
+        
+#         for i in range( len(items) ):
+#             if str(count_sort_filter) in str( items[i] ):
+#                 to_sort.append( items[i] )
+#                 to_pop_indices.append(i)
+        
+#         items = remove_elements_with_indices(items, to_pop_indices)
+        
+#         if len(to_sort) > 0:
+#             result.append( digit_count_sort(to_sort, count_sort_filter) )
+            
+#         count_sort_filter -= 1
+            
+#     return flatten_2D_list( result[::-1] )
+
+
+# def digit_count_sort(sequence, sort_filter):
+#     d = {}
+#     for i in range( len(sequence) ):
+#         '''
+#         sort_filter is the number to look for start from 9 going down to 0
+#         key = (sort_filter + count of sort_filter in each number) to int
+#         '''
+#         key = int( str(sort_filter) + str( str( sequence[i] ).count( str(sort_filter) ) ) )
+#         if key in d:
+#             d[key].append( sequence[i] )
+#         else:
+#             d[key] = [ sequence[i] ]
+#     d = { k: sorted(v) for k, v in d.items() } # sorted by value
+#     od = collections.OrderedDict( sorted( d.items() ) ) # ascending order by key
+#     s = [ sorted(l, key = get_digit_count_score) for l in od.values() ] # sorted by score
+#     return flatten_2D_list(s)
+
+
+# def get_digit_count_score(number):
+#     number_str = str(number)
+#     # sum of digit + 1 to the power of digit + 1
+#     # bigger result the bigger the digit
+#     s = sum( ( int(d) + 1 ) ** ( int(d) + 1 ) for d in number_str if d != '0' )
+#     # tie breaker for numbers with same sum s for example 522 and 225
+#     # does not work with 70 and 7 which both have same sum s
+#     p = number / ( 10 ** ( len(number_str) - 1 ) )
+#     score = ( (s + p) * 100 ) / 100
+#     return score
+
+
+# # get_scores works for numbers in same category only
+# # we're checking descending so category will be filtered
+# # from highest digit in the number
+# # for example [111111, 33, 241, 4321, 563, 73, 19, 9876, 99]
+# # we get the score of groups
+# # 9s [19, 9876], [99] | 7s [73] | 6s [563] | 4s [241, 4321] | 3s [33] | 1s [111111]
+# def get_scores(numbers):
+#     return [ { 'n': number, 's': get_digit_count_score(number) } for number in numbers ]
+
+# l = []
+# r = []
+# print( get_scores( l ) )
+# print( digit_count_sort( l, int( max( str( l[0] ) ) ) ) )
+# print( sort_by_digit_count(l) == r )
+
+
+"""
+Count divisibles in range - page 88
+"""
+
+# https://www.geeksforgeeks.org/count-numbers-divisible-m-given-range/
+# answer inspired from the website above
+def count_divisibles_in_range(start, end, n):
+    return end // n - start // n + int(start % n == 0)
+
+
+"""
+Bridge hand shape - page 89
+"""
+
+
+def bridge_hand_shape(hand):
+    return
 
 
 """
@@ -3003,6 +3369,7 @@ Sum of distinct cubes - page 108
 
 
 # https://stackoverflow.com/questions/72809141/sum-of-cubes-in-python
+# answer inspired from the website above
 def sum_of_distinct_cubes(n):
     n_a_cubes = [ ( n, int( n**( 1 / 3 ) ), [] ) ]
     while n_a_cubes:
