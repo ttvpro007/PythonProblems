@@ -2935,9 +2935,9 @@ def check_function(fname):
     test_one_function(f, testcases_, expected_checksum_, expected_answers=import_answer_for(fname))
 
 
-run_all()
+# run_all()
 
-# function_to_check = 'sort_by_digit_count'
+function_to_check = 'words_with_letters'
 
-# check_function(function_to_check)
+check_function(function_to_check)
 

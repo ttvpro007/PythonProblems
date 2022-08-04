@@ -1,4 +1,4 @@
-import numpy, fractions, collections, bisect, itertools
+import numpy, fractions, collections, bisect, itertools, re
 from operator import add, sub, mul, floordiv
 
 
@@ -372,9 +372,8 @@ def is_diagonal_direction(vector):
     return abs(vector[0]) == abs(vector[1]) != 0
 
 
-def is_same_direction(vector1, vector2):
+def is_collinear(vector1, vector2):
     cross_product = numpy.cross(vector1, vector2)
-    # print(f'cross_product of vector1 {vector1} and vector2 {vector2} is {cross_product}')
     return cross_product == 0
 
 
@@ -383,6 +382,20 @@ def file_to_list(file_name):
     lines = file.readlines()
     file.close()
     return [line.rstrip() for line in lines]
+
+
+def all_odds(sequence):
+    for item in sequence:
+        if item % 2 == 0:
+            return False
+    return True
+
+
+def all_evens(sequence):
+    for item in sequence:
+        if item % 2 == 1:
+            return False
+    return True
 
 
 """
@@ -547,56 +560,76 @@ Subsequent words - page 19
 """
 
 
+def get_subsequence_word_regex_pattern(letters):
+    start = '^.*'
+    end = '.*$'
+    mid = ''
+    for i in range( len(letters) - 1 ):
+        followed_by = f'[^{ letters[ i + 1 ] }]*'
+        mid += letters[i] + followed_by
+    else:
+        mid += letters[-1]
+    return start + mid + end
+
+
 def words_with_letters(words, letters):
-    
-    result = []
-    for word in words:
-        if check_word_with_letters(word, letters):
-            result.append(word)
-            
-    return result
+    r = re.compile( get_subsequence_word_regex_pattern(letters) )            
+    return list( filter(r.match, words) )
 
 
-def check_word_with_letters(word, letters):
+# def words_with_letters(words, letters):
+#     words_sorted_file = open('words_sorted.txt', 'r')
+#     text = words_sorted_file.read()
+#     words_sorted_file.close()
+#     return re.findall( '.*' + '.*'.join( letters ) + '.*', text )
+
+
+# def words_with_letters(words, letters):
+#     pattern = ''.join( [l + '.*' for l in letters] )
+#     return [ word for word in words if re.search(pattern, word) ]
+
+
+# def words_with_letters(words, letters):
+#     return [ word for word in words if check_word_with_letters(word, letters) ]
+
+
+# def check_word_with_letters(word, letters):
     
-    # remove invalid cases
-    if len(word) < len(letters):
-        return False
+#     # remove invalid cases
+#     if len(word) < len(letters):
+#         return False
     
-    # return true only when is exact match
-    if len(word) == len(letters):
-        return word == letters
+#     # return true only when is exact match
+#     if len(word) == len(letters):
+#         return word == letters
     
-    # narrow search window in the word for first letter of letters sequence
-    # then store last match index if we got a matching letter in the word to start next search from there
-    # e.g. 'brohiic' and 'bronchiectatic' we search 'b' in the first 8 letters of 'bronchiectatic' only
-    # since if we don't have any match for letter 'b' after 8 letters, that word is invalid
-    #        0123456
-    #        brohiic
-    # bronchiectatic
-    # 01234567
-    # the letter 'b' at index 0 of letters will be compared to the first 8 letters (index 0-7) in the sample word
+#     # narrow search window in the word for first letter of letters sequence
+#     # then store last match index if we got a matching letter in the word to start next search from there
+#     # e.g. 'brohiic' and 'bronchiectatic' we search 'b' in the first 8 letters of 'bronchiectatic' only
+#     # since if we don't have any match for letter 'b' after 8 letters, that word is invalid
+#     #        0123456
+#     #        brohiic
+#     # bronchiectatic
+#     # 01234567
+#     # the letter 'b' at index 0 of letters will be compared to the first 8 letters (index 0-7) in the sample word
     
-    match_count = 0
-    last_match_index = -1
-    
-    for i in range(len(letters), 0, -1):
+#     match_count = 0
+#     start_search_index = 0
+#     for i in range(len(letters), 0, -1):
         
-        # as we iterate throuth the letters, we expand the search window for the next letter
-        start_search_index = last_match_index + 1 if -1 < last_match_index else 0
-        
-        for j in range(start_search_index, len(word) - i + 1):
-            if letters[len(letters) - i] == word[j]:
-                match_count += 1
-                last_match_index = j
-                break
+#         # as we iterate throuth the letters, we expand the search window for the next letter
+#         for j in range(start_search_index, len(word) - i + 1):
+#             if letters[len(letters) - i] == word[j]:
+#                 match_count += 1
+#                 start_search_index = j + 1
+#                 break
+#         # if reached the end of search but match count does not match 
+#         # the number of letter searched we return false
+#         else:
+#             if len(letters) != match_count:
+#                 return False
             
-            # if reached the end of search but match count does not match 
-            # the number of letter searched we return false
-            if j == len(word) - i != match_count:
-                return False
-            
-    return match_count == len(letters)
+#     return match_count == len(letters)
 
 
 """
@@ -2570,81 +2603,6 @@ def can_meet(frog1, frog2):
 Where no one can hear you bounce - page 70
 """
 
-# not completed
-def reach_corner(x, y, n, m, aliens, debug = False):
-
-    corners = [ (0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1) ]
-    initial_directions = [ (-1, -1), (-1, 1), (1, -1), (1, 1) ]
-    
-    if debug:
-        print(f'\ncorners are {corners}')
-        print(f'aliens are {aliens}')
-        print(f'board dimension is {n} x {m}')
-        
-        print(f"bishop's position is at {x, y}")
-    
-    corners_info = [ {
-        'point'             : c,
-        'alien blocking'    : None 
-        } for c in corners ]
-    
-    aliens_info = [ {
-        'point'             : a,
-        'blocking corner'   : None
-        } for a in aliens  ]
-    
-    for i in range(len(corners_info)):
-        
-        vector_to_corner = to_vector_2D( corners_info[i]['point'], (x, y) )
-        
-        # bishop can only move diagonally
-        if is_diagonal_direction(vector_to_corner):
-            
-            if debug:
-                print(f"bishop {x, y} can move to point {corners_info[i]['point']}")
-            
-            # if no alien when we have valid corner
-            if aliens == []:
-                if debug:
-                    print(corners_info)
-                    print('1 return here')
-                return True
-            
-            for j in range(len(aliens_info)):
-                
-                if aliens_info[j]['blocking corner']:
-                    continue
-                
-                if corners_info[i]['alien blocking']:
-                    continue
-                
-                vector_to_alien = to_vector_2D( aliens_info[j]['point'], (x, y) )
-                if is_same_direction(vector_to_corner, vector_to_alien):
-                    aliens_info[j]['blocking corner'] = corners_info[i]['point']
-                    corners_info[i]['alien blocking'] = aliens_info[j]['point']
-                    
-                    if debug:
-                        print(f"---bishop {x, y} can move to point {corners_info[i]['point']}")
-
-        elif debug:
-            print(f"bishop {x, y} cannot move to point {corners_info[i]['point']}")
-    
-    # check if we have any corner left unblocked
-    # if yes, we return True
-    for i in range(len(corners_info)):
-        
-        vector_to_corner = to_vector_2D( corners_info[i]['point'], (x, y) )
-        
-        if is_diagonal_direction(vector_to_corner) and not corners_info[i]['alien blocking']:
-            if debug:
-                print(corners_info)
-                print('2 return here')
-            return True
-    if debug:
-        print(corners_info)
-        print('3 return here')
-    return False
-
 
 class Boundary2D:
     def __init__(self, dimension):
@@ -2654,6 +2612,12 @@ class Boundary2D:
         is_within_x_bounds = position[0] >= self.min_x and position[0] <= self.max_x
         is_within_y_bounds = position[1] >= self.min_y and position[1] <= self.max_y
         return is_within_x_bounds and is_within_y_bounds
+    
+    
+def is_c_on_line_a_b(a, b, c):
+    ab = to_vector_2D(a, b)
+    ac = to_vector_2D(a, c)
+    return is_collinear(ab, ac) and numpy.dot(ab, ac) > 0
         
         
 def get_boundary_point(position, direction, boundary):
@@ -2684,21 +2648,20 @@ def get_diagonal_bounce_points(origin_point, initial_direction, board_dimension)
     origin_point : TYPE tuple (x, y)
         DESCRIPTION origin point of the ball.
     initial_direction : TYPE tuple (x, y)
-        DESCRIPTION initial moving direction diagonally (only works with x and y = 1 or 0)
+        DESCRIPTION initial moving direction diagonally (restricted x and y = 1 or -1)
     board_dimension : TYPE tuple (x, y)
-        DESCRIPTION the dimension of the square in which the ball can bounce.
+        DESCRIPTION the dimension of the rect in which the ball can bounce.
 
     Returns
     -------
     List of bounce points type tuple (x, y).
 
     """
-    print('initial_direction', initial_direction)
     n = board_dimension[0]
     m = board_dimension[1]
     corners = [ (0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1) ]
     
-    bounce_points = []
+    bounce_points = [origin_point]
     current_position = origin_point
     current_direction = [ initial_direction[0], initial_direction[1] ]
     boundary = Boundary2D(board_dimension)
@@ -2707,8 +2670,11 @@ def get_diagonal_bounce_points(origin_point, initial_direction, board_dimension)
         
         bounce_point = get_boundary_point(current_position, current_direction, boundary)
         
-        if bounce_point in bounce_points:
-            break
+        # same as origin_point initial which is bounce direction
+        if bounce_point == origin_point: return None
+        
+        # break if loop
+        if bounce_point in bounce_points: break
         
         # if bounce on x bounds flip x direction
         if bounce_point[0] == boundary.min_x or bounce_point[0] == boundary.max_x:
@@ -2725,46 +2691,54 @@ def get_diagonal_bounce_points(origin_point, initial_direction, board_dimension)
         
     return bounce_points
 
+# this filter out unreachable position from original position
+def reachable_positions(original_position, alien_positions):
+    is_original_coord_uniformed = all_odds(original_position) or all_evens(original_position)
+    if is_original_coord_uniformed:
+        return [ a_pos for a_pos in alien_positions if all_odds(a_pos) or all_evens(a_pos) ]
+    else:
+        return [ a_pos for a_pos in alien_positions if not all_odds(a_pos) ]
 
-def print_corners(board_dimension):
-    n = board_dimension[0]
-    m = board_dimension[1]
-    corners = [ (0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1) ]
-    print('corners', corners)
+
+def reach_corner(x, y, n, m, aliens):
     
-
-# bishop_position = (1, 4)
-# board_dimension = (32, 8)
-initial_directions = [ (-1, -1), (-1, 1), (1, -1), (1, 1) ]
-
-bishop_position = (0, 2)
-board_dimension = (5, 5)
-
-print_corners(board_dimension)
-
-for initial_direction in initial_directions:
-    print( get_diagonal_bounce_points(bishop_position, initial_direction, board_dimension) )
-    print()
-
+    bishop_position = (x, y)
+    board_dimension = (n, m)
+    corners = reachable_positions( bishop_position, [ (0, 0), (n - 1, 0), (0, m - 1), (n - 1, m - 1) ] )
+    aliens = reachable_positions(bishop_position, aliens)
+    initial_directions = [ (-1, -1), (-1, 1), (1, -1), (1, 1) ]
     
+    if bishop_position in corners: return True
     
-
+    valid_paths_to_corners = []
+    
+    # get the valid paths to corners
+    for initial_direction in initial_directions:
+        potential_path_to_corner = get_diagonal_bounce_points(bishop_position, initial_direction, board_dimension)
         
-
-
-# print(reach_corner( 0, 2, 5, 5, [], debug = True ) )
-# print(reach_corner( 4, 4, 9, 9, [(0, 0), (0, 8), (8, 0), (8, 8)], debug = True ) )
-# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 0)], debug = True ) )
-# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)], debug = True ) )
-# print(reach_corner( 3, 2, 4, 4, [(1, 2), (0, 1)], debug = True ) )
-# print(reach_corner( 3, 2, 5, 4, [(2, 2), (1, 4)], debug = True ) )
-
-# print(reach_corner( 0, 2, 5, 5, [], debug = False ) )
-# print(reach_corner( 4, 4, 9, 9, [(0, 0), (0, 8), (8, 0), (8, 8)], debug = False ) )
-# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 0)], debug = False ) )
-# print(reach_corner( 1, 1, 1000, 2, [(0, 0), (0, 1), (999, 1)], debug = False ) )
-# print(reach_corner( 3, 2, 4, 4, [(1, 2), (0, 1)], debug = False ) )
-# print(reach_corner( 3, 2, 5, 4, [(2, 2), (1, 4)], debug = False ) )
+        if not potential_path_to_corner: continue
+        
+        if potential_path_to_corner[-1] in corners:
+            valid_paths_to_corners.append( potential_path_to_corner )
+    
+    # begin checking if any alien is blocking our valid paths
+    for i in range( len(aliens) ):
+        
+        for j in range( len(valid_paths_to_corners) ):
+            
+            if not valid_paths_to_corners[j]: continue
+            
+            for k in range( len( valid_paths_to_corners[j] ) - 1 ):
+                
+                a = valid_paths_to_corners[j][k]
+                b = valid_paths_to_corners[j][k + 1]
+                c = aliens[i]
+                
+                if is_c_on_line_a_b(a, b, c):
+                    valid_paths_to_corners[j] = None
+                    break
+    
+    return not all( path is None for path in valid_paths_to_corners )
 
 
 """
@@ -3323,9 +3297,9 @@ def count_divisibles_in_range(start, end, n):
 Bridge hand shape - page 89
 """
 
-
-def bridge_hand_shape(hand):
-    return
+# not completed
+# def bridge_hand_shape(hand):
+#     return
 
 
 """
