@@ -691,17 +691,10 @@ def safe_squares_rooks(n, rooks):
     if len(rooks) < 1:
         return n * n
     
-    dangerous_rows = []
-    dangerous_cols = []
-    safe_rows = []
-    safe_cols = []
-    
-    for rook in rooks:
-        dangerous_cols.append(rook[0])
-        dangerous_rows.append(rook[1])
+    dangerous_rows, dangerous_cols = zip(*rooks)
         
-    safe_rows = get_available_number_in_range(list(set(dangerous_rows)), n)
-    safe_cols = get_available_number_in_range(list(set(dangerous_cols)), n)
+    safe_rows = get_available_number_in_range(list( set(dangerous_rows) ), n)
+    safe_cols = get_available_number_in_range(list( set(dangerous_cols) ), n)
     
     #result is the product of the number of safe x positions and the number of safe y positions
     return len(safe_rows) * len(safe_cols)
@@ -713,14 +706,12 @@ def get_available_number_in_range(input_list, max_range):
         return []
     
     input_list.sort()
-    output_list = []
-    output_list += [n for n in range(0, input_list[0])]
+    output_list = [ n for n in range( 0, input_list[0] ) ]
     
-    for index, item in enumerate(input_list):
-        if index < len(input_list) - 1:
-            output_list += [n for n in range(item + 1, input_list[index + 1])]
-        else:        
-            output_list += [n for n in range(input_list[len(input_list) - 1] + 1, max_range)]
+    for i in range( len(input_list) - 1 ):
+        output_list += [ n for n in range( input_list[i] + 1, input_list[i + 1] ) ]
+    else:        
+        output_list += [ n for n in range(input_list[len(input_list) - 1] + 1, max_range) ]
             
     return output_list
 
@@ -3328,7 +3319,7 @@ def fibonacci_sum(n):
 def fibonacci_sequence(threshold):
     
     a, b = 0, 1
-    fib_seq = [a, b]
+    fib_seq = [a]
     
     while b <= threshold:
         a, b = b, a + b

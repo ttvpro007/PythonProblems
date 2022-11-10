@@ -2937,7 +2937,7 @@ def check_function(fname):
 
 # run_all()
 
-function_to_check = 'words_with_letters'
+function_to_check = 'fibonacci_sum'
 
 check_function(function_to_check)
 
